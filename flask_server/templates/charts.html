@@ -1,0 +1,29 @@
+{% extends "index.html" %} {% block charts %}
+<ul class="charts-list">
+	{% for meter in meters %}
+	<li id="chart_li_{{ meter.id }}" class="invisible">
+		<div class="date-range-picker-container">
+			<div class="period-container">
+				<ol id="periodSelector_{{ meter.id }}" class="selectable">
+					<li class="ui-widget-content ui-selected" id="h">Hour</li>
+					<li class="ui-widget-content" id="d">Day</li>
+					<li class="ui-widget-content" id="w">Week</li>
+					<li class="ui-widget-content" id="m">Month</li>
+					<li class="ui-widget-content" id="y">Year</li>
+				</ol>
+			</div>
+
+			<input id="date-range-picker_{{ meter.id }}"
+				name="date-range-picker_{{ meter.id }}">
+				
+			<button id="refresh_button_{{ meter.id }}" class="ui-priority-primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only">
+			<span class="ui-button-text">Refresh</span></button>
+
+		</div>
+
+		<div id="chart_{{ meter.id }}" class="chart-container"></div>
+
+	</li> 
+	{% endfor %}
+</ul>
+{% endblock %}

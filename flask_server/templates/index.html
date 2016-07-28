@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta charset="utf-8">
+
+<title>RaspiMeter</title>
+
+<link href="http://fonts.googleapis.com/css?family=Open+Sans:400"
+	rel="stylesheet">
+{% assets "css" %}
+<link rel="stylesheet" href="{{ ASSET_URL }}" />
+{% endassets %}
+</head>
+<body>
+	<header class="compact">
+
+		<div class="sitename-logo">
+			<h1>
+				<a href="#">RaspiMeter</a>
+			</h1>
+		</div>
+
+		<div class="top-menu">
+			<ul class="top-menu-list">
+				<li><a id="chart-link" href="/">Charts</a></li>
+				<li><a id="meters-link" href="/meters">Meters</a></li>
+				<li><a id="settings-link" href="/settings">Settings</a></li>
+			</ul>
+		</div>
+
+	</header>
+
+	<div class="main-content">
+
+		{% block charts %}{% endblock %} 
+		{% block meters %}{% endblock %} 
+		{% block images %}{% endblock %}
+		{% block settings %}{% endblock %}
+
+		<div class="single-product page">
+
+			<div class="overlay"></div>
+
+			<div class="preview-large">
+				<div class="loader"></div>
+				<h3>Test</h3>
+				<img src="" />
+
+				<div class="meter-value-rectangle">
+					<ul class="digits-list"></ul>
+				</div>
+				<div class="save-container">
+
+					<!-- div class="meter-values-list">
+						<div class="meter-value">
+							<span>Previous value: </span>TODO
+						</div>
+						<div class="meter-value">
+							<span>Next value: </span>TODO
+						</div>
+					</div-->
+
+					<!-- ul class="meter-values-list">
+					<li><span>Previous value: </span>TODO</li>
+					<li><span>Next value: </span>TODO</li>
+				</ul-->
+
+					<form class="controls-container">
+						<div class="knn-checkbox">
+							<label><input type="checkbox" id="use_for_knn"
+								name="use-for-knn" disabled="true" value="0">Use for
+								recognition</label>
+							<div class="button-container">
+								<button id="save_button" class="disabled-button">Save</button>
+							</div>
+						</div>
+
+						<div class="knn-checkbox">
+							
+							<label><input type="checkbox" id="permanently_delete"
+								name="permanently_delete" disabled="true" checked="false"
+								value="0">Permanently delete</label>
+							
+							<div class="button-container">
+								<button id="delete_button" class="delete-button">Delete</button>
+							</div>
+						</div>
+
+					</form>
+				</div>
+
+				<span class="close">×</span>
+			</div>
+
+		</div>
+
+		<div class="error page">
+			<h3>Sorry, something went wrong :(</h3>
+		</div>
+
+	</div>
+
+	{% assets "js" %}
+	<script type="text/javascript" src="{{ ASSET_URL }}"></script>
+	{% endassets %}
+
+</body>
+</html>
