@@ -896,7 +896,11 @@ $(function () {
 									
 								var chart = $('#chart_' + meterId).highcharts();
 								var costsAndConsumption = calculateCostsAndConvertedConsumption(meter, consumption);
-									
+								
+								weather.forEach(function (item) {
+									item[1] = parseFloat((item[1]).toFixed(1));
+								});
+								
 								chart.series[0].setData(costsAndConsumption['units'], true);
 								chart.series[1].setData(costsAndConsumption['costs'], true);
 								chart.series[2].setData(costsAndConsumption['convUnits'], true);

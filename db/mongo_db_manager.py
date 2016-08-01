@@ -508,7 +508,7 @@ class MongoDataBaseManager():
             map_f_body = """    
                 key.setDate(1);
                 key.setMonth(0);
-                key.setHours(0);
+                key.setHours(1);
             """
         
         else: 
