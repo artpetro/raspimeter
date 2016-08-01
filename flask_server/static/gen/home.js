@@ -1002,18 +1002,13 @@ $(function () {
 
 	function renderChart(meter, consumption, weather) {
 
-//		console.log("Data in renderChart: ");
-//		console.log(data);
-			
 		var id = meter['_id']['$oid'];
 			
-		// calculate costs
-		// TODO calculate converted units
-		// TODO store and use costs per period
-		// TODO valuta
 		var costsAndConsumption = calculateCostsAndConvertedConsumption(meter, consumption);
-		
-//		console.log(costsAndConsumption);
+
+		weather.forEach(function (item) {
+			item[1] = parseFloat((item[1]).toFixed(2));
+		});
 		
 		Highcharts.setOptions({
 	        global: {
@@ -1026,8 +1021,6 @@ $(function () {
 	        chart: {
 	            type: 'spline',
 	            zoomType: 'xy',
-//	            width: null,
-//	    	    height: null,
 	        },
 	        rangeSelector: {
 	               selected: 1,
@@ -1063,20 +1056,14 @@ $(function () {
 	                    color: Highcharts.getOptions().colors[0]
 	                }
 	            },
-//	            labels: {
-//	                format: '{value} mm',
-//	                style: {
-//	                    color: Highcharts.getOptions().colors[0]
-//	                }
-//	            },
 	        },
 	        { 
-//	            labels: {
-//	                format: '{value}°C',
-//	                style: {
-//	                    color: Highcharts.getOptions().colors[1]
-//	                }
-//	            },
+	            labels: {
+	                format: '{value} °C',
+	                style: {
+	                    color: Highcharts.getOptions().colors[1]
+	                }
+	            },
 	        	opposite: true,
 	            title: {
 	                text: 'Temperature',
@@ -1101,7 +1088,6 @@ $(function () {
 	            name: meter.meter_settings['value_units'],
 	            data: costsAndConsumption['units'],
 	            type: 'column',
-//	            turboThreshold: 7000,
 	        },
 	        {
 		        name: '€',
@@ -1118,7 +1104,7 @@ $(function () {
 	        {
 			            
 		        type: 'spline',
-		        name: 'Temperatur',
+		        name: '°C',
 		        data: weather,
 		        yAxis: 1,
 			        
