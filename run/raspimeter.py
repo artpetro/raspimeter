@@ -145,22 +145,24 @@ class Raspimeter(threading.Thread):
         
         
     @staticmethod
-    def readAndRecognizeAllImages(db, meter_id, store_recognized_images):
+    def readAndRecognizeAllImages(db, meter_id, page, store_recognized_images):
         '''
         '''
         flags = (NOT_TRAINED, DIGITS_NOT_RECOGNIZED, NOT_ENOUGH_DIGITS, PREPROCESSING_ERROR)
-        meter_images = []
-        
-        for flag in flags:
-            meter_images.extend(db.getImages(meter_id, flag))
+        pagination = db.getImagesWithPagination(meter_id, flag=ALL_VALUES, page=page, per_page=20)
         
         success_recogn_count = 0
         
-        for meter_image in meter_images:
-            flag = Raspimeter.readAndRecognizeImage(db, meter_image['name'], store_recognized_images)[1]
+        for meter_value in pagination.items:
             
-            if flag == VALIDE_VALUE:
-                success_recogn_count += 1
+            timestamp = meter_value.timestamp
+            image_name = "%s_%s_%s.png" % (timestamp.strftime('%Y-%m-%d_%H-%M-%S'), meter_value.meter.id, meter_value.id)
+            
+            if meter_value.flag in flags:
+                flag = Raspimeter.readAndRecognizeImage(db, image_name, store_recognized_images)[1]
+            
+                if flag == VALIDE_VALUE:
+                    success_recogn_count += 1
                 
         return success_recogn_count
         

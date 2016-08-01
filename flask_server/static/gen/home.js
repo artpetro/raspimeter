@@ -487,10 +487,11 @@ $(function () {
 		e.preventDefault();
 		
 		var meterId = $('.products-list').attr('id');
+		var page = $(this).attr('id');
 		
-//		console.log(meterId);
+		console.log(page);
 		
-		$.getJSON( "recognize_all?meter_id=" + meterId, function(data) {
+		$.getJSON( "recognize_all?meter_id=" + meterId + "&page=" + page, function(data) {
 			
 			// TODO loader.gif
 			console.log(data);
