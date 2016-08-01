@@ -136,7 +136,7 @@ class Raspimeter(threading.Thread):
         # get last recognized value
         last_value = db.getLastValideMeterValue(meter_id)
         
-        if last_value < numeric_value:
+        if last_value <= numeric_value:
             return VALIDE_VALUE
         
         else:
