@@ -209,7 +209,16 @@ class MongoDataBaseManager():
         
         return meter_value.id
                   
-         
+    @staticmethod   
+    def getLastValideMeterValue(meter_id):
+        '''
+        '''
+        meter = Meter.objects(id=meter_id).first()
+        meter_value = MeterValue.objects(meter=meter, flag=VALIDE_VALUE).order_by('-timestamp').first()
+        
+        return meter_value.numeric_value
+        
+             
     @staticmethod   
     def deleteMeterValue(value_id):
         '''

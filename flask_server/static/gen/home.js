@@ -934,7 +934,6 @@ $(function () {
 			        
 				$(".ui-selected", this).each(function() {
 			    
-//					console.log("selected: " + $(this).attr("id"));
 					redrawChart(meter);
 		        
 				});

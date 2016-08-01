@@ -114,7 +114,7 @@ class Raspimeter(threading.Thread):
         
         if flag == RECOGNIZED:
             numeric_value = int(''.join(map(str, digits_values)))
-            flag = Raspimeter.validateMeterValue(meter, numeric_value)
+            flag = Raspimeter.validateMeterValue(db, meter.id, numeric_value)
             
         meter_value_id = db.storeMeterValue(meter.id, timestamp, flag, numeric_value)
             
@@ -129,11 +129,18 @@ class Raspimeter(threading.Thread):
             
     
     @staticmethod
-    def validateMeterValue(meter_id, numeric_value):
+    def validateMeterValue(db, meter_id, numeric_value):
         '''
         TODO implement depends on meter settings
         '''
-        return VALIDE_VALUE
+        # get last recognized value
+        last_value = db.getLastValideMeterValue(meter_id)
+        
+        if last_value < numeric_value:
+            return VALIDE_VALUE
+        
+        else:
+            return NOT_VALIDE_VALUE
         
         
         
