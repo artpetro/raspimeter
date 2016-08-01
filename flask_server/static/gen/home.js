@@ -825,7 +825,7 @@ $(function () {
 		
 	// Initial variables for chart-container
 	// date for charts for MySQL: "YYYY-MM-DD HH:MM:SS"
-	var period = 'h';
+	var period = 'd';
 		
 	var startMoment = moment().subtract(1, 'months').startOf('day');
 	var endMoment = moment();
@@ -1007,7 +1007,7 @@ $(function () {
 		var costsAndConsumption = calculateCostsAndConvertedConsumption(meter, consumption);
 
 		weather.forEach(function (item) {
-			item[1] = parseFloat((item[1]).toFixed(2));
+			item[1] = parseFloat((item[1]).toFixed(1));
 		});
 		
 		Highcharts.setOptions({

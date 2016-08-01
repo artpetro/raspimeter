@@ -400,7 +400,7 @@ $(function () {
 		
 	// Initial variables for chart-container
 	// date for charts for MySQL: "YYYY-MM-DD HH:MM:SS"
-	var period = 'h';
+	var period = 'd';
 		
 	var startMoment = moment().subtract(1, 'months').startOf('day');
 	var endMoment = moment();
