@@ -223,25 +223,33 @@ class MongoDataBaseManager():
         
              
     @staticmethod   
-    def deleteMeterValue(value_id):
+    def deleteMeterValue(value_id, perm):
         '''
         '''
         try:
             meter_value = MeterValue.objects(id=value_id).first()
             flag = meter_value.flag
+            meter = meter_value.meter
+            timestamp = meter_value.timestamp
+            
+            deleted = False
             
             MeterValue.objects(id=value_id).update_one(set__flag=DELETED, upsert=True)
             
             if flag == VALIDE_VALUE:
                   
                 try:
-                    MongoDataBaseManager.updatePeriodicConsumptions(meter_value.timestamp, meter_value.meter)
+                    MongoDataBaseManager.updatePeriodicConsumptions(timestamp, meter)
               
                 except Exception as e:
                     traceback.print_exc()
                     return "timestamp: %s meter_id: %d, error update periodic (deleteMeterValue): %s" % (str(e))
+
+            if perm:
+                meter_value.delete()
+                deleted = True
                      
-            return True
+            return deleted
              
         except Exception as e:
             traceback.print_exc()
@@ -533,8 +541,9 @@ class MongoDataBaseManager():
          
          
 if __name__ == '__main__':
+    pass
     
-    MeterValue.objects().update(set__has_image=True, upsert=True)
+    #MeterValue.objects().update(set__has_image=True, upsert=True)
     
 
 #     

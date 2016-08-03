@@ -188,7 +188,6 @@ class Raspimeter(threading.Thread):
         return meter_image, flag, numeric_value, digits_values
     
     
-    
     @staticmethod    
     def trainKNNAndStoreIntoDB(db, image_name, responses, manually=False):
         '''

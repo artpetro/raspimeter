@@ -642,7 +642,6 @@ $(function () {
 
 		var list = $('.single-product .preview-large .meter-value-rectangle .digits-list .digit-input');
 
-//		console.log("train knn");
 		var responses = []
 		
 		list.each(function(index) {
@@ -660,7 +659,9 @@ $(function () {
 		
 		console.log(responses);
 		
-		$.getJSON( "/save_digits?image_name=" + imageName + "&responses=" +  JSON.stringify(responses), function(resp) {
+		var train = $('#use_for_knn').prop('checked');
+		
+		$.getJSON( "/save_digits?image_name=" + imageName + "&train=" + train + "&responses=" +  JSON.stringify(responses), function(resp) {
 			
 			console.log(resp);
 			$('#save_button').addClass('disabled-button');
@@ -676,8 +677,10 @@ $(function () {
 		var container = $('.preview-large');
 		var time = container.find('h3').text();
 		var imageName = container.find('img').attr('image-name');
+		
+		var perm_delete = $('#permanently_delete').prop('checked');
 
-		$.getJSON( "/delete_image?image_name=" + imageName, function(resp) {
+		$.getJSON( "/delete_meter_value?image_name=" + imageName + "&perm=" + perm_delete, function(resp) {
 			
 			console.log(resp);
 			$("li[id*='" + time + "']").remove();

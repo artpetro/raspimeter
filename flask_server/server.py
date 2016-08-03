@@ -185,6 +185,23 @@ def getImages():
     return json.dumps(db.getImages(meter_id=meter_id, flag=int(flag)))
 
 
+@app.route("/delete_meter_value", methods=['GET'])
+def deleteMeterValue():
+    '''
+    '''
+    image_name = request.args.get('image_name')
+    value_id = image_name.split('_')[3].split('.')[0]
+    
+    perm = True if request.args.get('perm') == 'true' else False
+    
+    if perm:
+        Raspimeter.deleteImage(image_name)
+        
+    deleted_from_db = db.deleteMeterValue(value_id, perm)
+
+    return json.dumps({'deleted_from_db': deleted_from_db})
+
+
 @app.route("/delete_image", methods=['GET'])
 def deleteImage():
     '''
@@ -194,9 +211,6 @@ def deleteImage():
     
     db.deleteImage(value_id)
     Raspimeter.deleteImage(image_name)
-    
-#     deleted_from_db = db.deleteMeterValue(value_id)
-#     # TODO delete image from file system
     
     return json.dumps({'deleted_from_db': True})
 
@@ -209,18 +223,20 @@ def saveDigits():
     '''
     image_name = request.args.get('image_name')
     responses = json.loads(str(request.args.get('responses')))
+    train = request.args.get('train')
     store_recognized_images = True
     
     new_records_count = Raspimeter.trainKNNAndStoreIntoDB(db, image_name, responses)
     
     # recognize and update value
     meter_image, flag, numeric_value, digits = Raspimeter.readAndRecognizeImage(db, image_name, store_recognized_images)
-
+    
     return json.dumps({'new_records': new_records_count, 
-                       'responses': responses, 
-                       'flag': flag, 
-                       'numeric_value': numeric_value,
-                       'digits': digits})
+                        'responses': responses, 
+                        'flag': flag, 
+                        'numeric_value': numeric_value,
+                        'digits': digits})
+        
 
 
 @app.route("/get_digits", methods=['GET'])
