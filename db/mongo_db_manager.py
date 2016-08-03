@@ -185,7 +185,7 @@ class MongoDataBaseManager():
         '''
         meter = Meter.objects(id=meter_id).first()
         
-        meter_values = MeterValue.objects(has_image=True, meter=meter) if flag == ALL_VALUES else MeterValue.objects(flag=flag, meter=meter)
+        meter_values = MeterValue.objects(has_image=True, meter=meter) if flag == ALL_VALUES else MeterValue.objects(has_image=True, flag=flag, meter=meter)
 
         return meter_values.paginate(page=page, per_page=per_page)
                   
