@@ -261,6 +261,23 @@ class MongoDataBaseManager():
         '''
         '''
         MeterValue.objects(id=value_id).update_one(set__has_image=False, upsert=True)
+        
+        
+    @staticmethod
+    def deleteAllSuccRecImages():
+        '''
+        tmp method to remove all successfull recognized images from file system 
+        '''
+        meter_values = MeterValue.objects(flag=VALIDE_VALUE)
+        
+        for meter_value in meter_values:
+            meter_value.update(set__has_image=False)
+            timestamp = meter_value.timestamp
+            image_name = "%s_%s_%s.png" % (timestamp.strftime('%Y-%m-%d_%H-%M-%S'), meter_value.meter.id, meter_value.id)
+            from run.raspimeter import Raspimeter
+            Raspimeter.deleteImage(image_name)
+            
+        
      
 
     @staticmethod
@@ -541,9 +558,8 @@ class MongoDataBaseManager():
          
          
 if __name__ == '__main__':
-    pass
-    
-    #MeterValue.objects().update(set__has_image=True, upsert=True)
+
+    MongoDataBaseManager.deleteAllSuccRecImages()
     
 
 #     

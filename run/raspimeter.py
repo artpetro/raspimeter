@@ -217,5 +217,9 @@ class Raspimeter(threading.Thread):
         '''
         '''
         path = ROOT_DIR + image_name
-        os.remove(path)
-        os.remove(os.path.splitext(path)[0]+'_preview.png')
+        try:
+            os.remove(path)
+            os.remove(os.path.splitext(path)[0]+'_preview.png')
+            
+        except:
+            print "file not found %s" % image_name
