@@ -86,10 +86,7 @@ class Raspimeter(threading.Thread):
         meter.last_capture = image_name
         
         self.__db.updateWeather(meter, timestamp)
-        
-        
-        
-    
+
     
     @staticmethod
     def recognizeMeterValue(db, meter, image):
@@ -148,7 +145,7 @@ class Raspimeter(threading.Thread):
     def readAndRecognizeAllImages(db, meter_id, page, store_recognized_images):
         '''
         '''
-        flags = (NOT_TRAINED, DIGITS_NOT_RECOGNIZED, NOT_ENOUGH_DIGITS, PREPROCESSING_ERROR)
+        flags = (NOT_TRAINED, DIGITS_NOT_RECOGNIZED, NOT_ENOUGH_DIGITS, PREPROCESSING_ERROR, NOT_VALIDE_VALUE)
         pagination = db.getImagesWithPagination(meter_id, flag=ALL_VALUES, page=page, per_page=20)
         
         success_recogn_count = 0
@@ -159,10 +156,14 @@ class Raspimeter(threading.Thread):
             image_name = "%s_%s_%s.png" % (timestamp.strftime('%Y-%m-%d_%H-%M-%S'), meter_value.meter.id, meter_value.id)
             
             if meter_value.flag in flags:
+                #print "recognize %d" % meter_value.flag
                 flag = Raspimeter.readAndRecognizeImage(db, image_name, store_recognized_images)[1]
+                #print "new flag %d" % flag
             
                 if flag == VALIDE_VALUE:
                     success_recogn_count += 1
+        
+        #print success_recogn_count
                 
         return success_recogn_count
         
