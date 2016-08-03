@@ -111,7 +111,7 @@ class Raspimeter(threading.Thread):
         
         if flag == RECOGNIZED:
             numeric_value = int(''.join(map(str, digits_values)))
-            flag = Raspimeter.validateMeterValue(db, meter.id, numeric_value)
+            flag = Raspimeter.validateMeterValue(db, meter.id, numeric_value, timestamp)
             
         meter_value_id = db.storeMeterValue(meter.id, timestamp, flag, numeric_value)
             
@@ -126,12 +126,12 @@ class Raspimeter(threading.Thread):
             
     
     @staticmethod
-    def validateMeterValue(db, meter_id, numeric_value):
+    def validateMeterValue(db, meter_id, numeric_value, timestamp):
         '''
         TODO implement depends on meter settings
         '''
         # get last recognized value
-        last_value = db.getLastValideMeterValue(meter_id)
+        last_value = db.getLastValideMeterValue(meter_id, timestamp)
         
         if last_value <= numeric_value:
             return VALIDE_VALUE
@@ -212,3 +212,11 @@ class Raspimeter(threading.Thread):
         knn_new_records_counter = knn.trainAndStoreData(digits, responses, manually)
         
         return knn_new_records_counter
+    
+    @staticmethod
+    def deleteImage(image_name):
+        '''
+        '''
+        path = ROOT_DIR + image_name
+        os.remove(path)
+        os.remove(os.path.splitext(path)[0]+'_preview.png')

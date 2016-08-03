@@ -95,6 +95,7 @@ class MeterValue(mongo_db_engine.Document):
     timestamp = mongo_db_engine.DateTimeField(unique=True, required=True, unique_with='meter')
     numeric_value = mongo_db_engine.IntField()
     flag = mongo_db_engine.IntField()
+    has_image = mongo_db_engine.BooleanField(default=False)
     meta = {
         'indexes': ['timestamp']
         }

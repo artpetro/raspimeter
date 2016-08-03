@@ -185,7 +185,7 @@ class MongoDataBaseManager():
         '''
         meter = Meter.objects(id=meter_id).first()
         
-        meter_values = MeterValue.objects(meter=meter) if flag == ALL_VALUES else MeterValue.objects(flag=flag, meter=meter)
+        meter_values = MeterValue.objects(has_image=True, meter=meter) if flag == ALL_VALUES else MeterValue.objects(flag=flag, meter=meter)
 
         return meter_values.paginate(page=page, per_page=per_page)
                   
@@ -210,11 +210,14 @@ class MongoDataBaseManager():
         return meter_value.id
                   
     @staticmethod   
-    def getLastValideMeterValue(meter_id):
+    def getLastValideMeterValue(meter_id, timestamp):
         '''
         '''
         meter = Meter.objects(id=meter_id).first()
-        meter_value = MeterValue.objects(meter=meter, flag=VALIDE_VALUE).order_by('-timestamp').first()
+        meter_value = MeterValue.objects(meter=meter, flag=VALIDE_VALUE, timestamp__lt=timestamp).order_by('-timestamp').first()
+        
+        if not meter_value:
+            return 0
         
         return meter_value.numeric_value
         
@@ -243,6 +246,13 @@ class MongoDataBaseManager():
         except Exception as e:
             traceback.print_exc()
             return str(e)
+    
+        
+    @staticmethod   
+    def deleteImage(value_id):
+        '''
+        '''
+        MeterValue.objects(id=value_id).update_one(set__has_image=False, upsert=True)
      
 
     @staticmethod
@@ -524,14 +534,9 @@ class MongoDataBaseManager():
          
 if __name__ == '__main__':
     
-    ws = MongoDataBaseManager.getWeather(period = 'd',
-                                    meter_id='575d169aca18a217bc725e70', 
-                                    start_date='2016-07-01 00:00:00', 
-                                    end_date='2016-07-10 23:59:59', 
-                                    show_date_as_string=True)
+    MeterValue.objects().update(set__has_image=True, upsert=True)
     
-    for w in ws:
-        print w
+
 #     
 #     API_KEY = '9d78daf127ad45a1d3f57f86e69accb4'
 #     position = 'Osnabrueck, Germany'

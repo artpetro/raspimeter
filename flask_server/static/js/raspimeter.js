@@ -79,7 +79,7 @@ $(function () {
 		render(decodeURI(window.location.hash));
 	});
 	
-	$('#deleteButton').click(function() {
+	$('#delete_button').click(function() {
 		deleteMeterImageAndMeterValue();
 		// don't reload page
 		return false;
@@ -252,7 +252,7 @@ $(function () {
 		var time = container.find('h3').text();
 		var imageName = container.find('img').attr('image-name');
 
-		$.getJSON( "delete_image?image_name=" + imageName, function(resp) {
+		$.getJSON( "/delete_image?image_name=" + imageName, function(resp) {
 			
 			console.log(resp);
 			$("li[id*='" + time + "']").remove();

@@ -192,10 +192,13 @@ def deleteImage():
     image_name = request.args.get('image_name')
     value_id = image_name.split('_')[3].split('.')[0]
     
-    deleted_from_db = db.deleteMeterValue(value_id)
-    # TODO delete image from file system
+    db.deleteImage(value_id)
+    Raspimeter.deleteImage(image_name)
     
-    return json.dumps({'deleted_from_db': deleted_from_db})
+#     deleted_from_db = db.deleteMeterValue(value_id)
+#     # TODO delete image from file system
+    
+    return json.dumps({'deleted_from_db': True})
 
 
 @app.route("/save_digits", methods=['GET'])
