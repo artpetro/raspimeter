@@ -202,12 +202,13 @@ class MongoDataBaseManager():
         
         meter = Meter.objects(id=meter_id).first()  
         
-        meter_value = MeterValue.objects(meter=meter, timestamp=timestamp).upsert_one(set__numeric_value=numeric_value, set__flag=flag)
+        meter_value = MeterValue.objects(meter=meter, timestamp=timestamp).upsert_one(set__numeric_value=numeric_value, set__flag=flag, set__has_image=True)
         
         if flag == VALIDE_VALUE:
             MongoDataBaseManager.updatePeriodicConsumptions(timestamp, meter)
         
         return meter_value.id
+    
                   
     @staticmethod   
     def getLastValideMeterValue(meter_id, timestamp):
