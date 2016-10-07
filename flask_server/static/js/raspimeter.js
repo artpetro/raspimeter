@@ -109,8 +109,6 @@ $(function () {
 			
 	
 	function renderSingleMeterValue(image){
-
-//		console.log(image);
 		
 		var page = $('.single-product');
 		var container = $('.preview-large');
@@ -123,6 +121,8 @@ $(function () {
 		
 			});	
 		});
+		
+		console.log(moment.utc(image.time, "YYYY-MM-DD H:mm:ss").format('lll'));
 		
 		container.find('h3').text(image.time);
 		container.find('img').attr('src', 'static/images/' + image.name);
@@ -773,5 +773,16 @@ $(function () {
 	
 	function meterSettingsCallback() {
 		
+	}
+	
+	function convertUTCDateToLocalDate(date) {
+	    var newDate = new Date(date.getTime()+date.getTimezoneOffset()*60*1000);
+
+	    var offset = date.getTimezoneOffset() / 60;
+	    var hours = date.getHours();
+
+	    newDate.setHours(hours - offset);
+
+	    return newDate;   
 	}
 });

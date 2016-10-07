@@ -349,12 +349,12 @@ class MongoDataBaseManager():
         weather = Weather(weather_api_key)
         #weather_timestamp = MongoDataBaseManager.getPeriodStart(timestamp, period='h')
         
-        if weather.isApiOnline():
-            current_weather = weather.getCurrentWeather(position)
+        #if weather.isApiOnline():
+        current_weather = weather.getCurrentWeather(position)
             
-            if current_weather:
-                temperature = current_weather.get_temperature('celsius')['temp'] 
-                WeatherValue.objects(meter=meter, timestamp=timestamp).upsert_one(set__temperature=temperature)
+        if current_weather:
+            temperature = current_weather.get_temperature('celsius')['temp'] 
+            WeatherValue.objects(meter=meter, timestamp=timestamp).upsert_one(set__temperature=temperature)
                 
      
     @staticmethod
@@ -443,6 +443,83 @@ class MongoDataBaseManager():
         return data
     
     @staticmethod
+    def getPeriodicConsumptionsMR(period='h', meter_id=1, start_date=None, end_date=None, show_date_as_string=False):
+        '''
+        575281fdca18a21894d35cf5
+        period=h
+        start_date=2016-05-04 00:00:00
+        end_date=2016-06-04 11:06:48
+        '''
+        data = []
+         
+        date_format = '%Y-%m-%d %H:%M:%S'
+        
+        meter = Meter.objects(id=meter_id).first()
+         
+        try: 
+            if not start_date:
+                start_date = Consumption.objects(meter=meter, period=period).first().timestamp
+            else:
+                start_date = datetime.strptime(start_date, date_format)
+             
+            if not end_date:
+                end_date = datetime.utcnow()
+             
+            else:
+                end_date = datetime.strptime(end_date, date_format)
+                 
+            start_date = MongoDataBaseManager.getPeriodStart(start_date, period)
+            end_date = MongoDataBaseManager.getPeriodEnd(end_date, period)
+            
+            map_f = MongoDataBaseManager.getMapFunction(period=period, data='meter_value')
+            
+            reduce_f = """
+                function(key, values) {
+                    return Math.min.apply(Math, values);
+                };
+            """
+            values = MeterValue.objects(meter=meter, flag=VALIDE_VALUE, timestamp__gte=start_date, timestamp__lte=end_date)
+            min_values = values.map_reduce(map_f, reduce_f, {"replace":"min_values"})
+            
+            reduce_f = """
+                function(key, values) {
+                    return Math.max.apply(Math, values);
+                };
+            """
+            
+            max_values = values.map_reduce(map_f, reduce_f, {"replace":"max_values"})
+            
+            epoch = datetime.utcfromtimestamp(0)
+            
+            # convert to dict
+            min_values = dict((c.key, c.value) for c in min_values)
+            max_values = dict((c.key, c.value) for c in max_values)
+            
+            
+            
+            min_max_values = dict(min_values.items() + max_values.items() + [(k, (min_values[k], max_values[k])) for k in set(min_values) & set(max_values)]) 
+            
+            for key in min_max_values:
+                value = min_max_values[key]
+                #print key
+                #print  value
+                
+                # millis for highchart
+                milliseconds = int((key - epoch).total_seconds()) * 1000
+                
+                if show_date_as_string:
+                    data.append([str(key), value])
+                else:
+                    data.append([milliseconds, value])
+            
+        except Exception as e:
+            print e
+            # TODO log
+            traceback.print_exc()
+             
+        return data
+    
+    @staticmethod
     def getWeather(period='h', meter_id=1, start_date=None, end_date=None, show_date_as_string=False, map_reduce=True):
         '''
         575281fdca18a21894d35cf5
@@ -514,7 +591,7 @@ class MongoDataBaseManager():
     
     
     @staticmethod
-    def getMapFunction(period = 'h'):
+    def getMapFunction(period = 'h', data='temperature'):
         map_f_pref = """
             function() {
                 var key = new Date(this.timestamp);
@@ -550,17 +627,25 @@ class MongoDataBaseManager():
         else: 
             map_f_body = ""
         
-        map_f_suff = """        
-                emit(key, this.temperature);
-            }
-        """
+        if data == 'temperature':
+            map_f_suff = """        
+                    emit(key, this.temperature);
+                }
+            """
+        elif data == 'meter_value':
+            map_f_suff = """        
+                    emit(key, this.numeric_value);
+                }
+            """
+            
         
         return map_f_pref + map_f_body + map_f_suff
          
          
 if __name__ == '__main__':
 
-    MongoDataBaseManager.deleteAllSuccRecImages()
+    pass
+    #MongoDataBaseManager.deleteAllSuccRecImages()
     
 
 #     
