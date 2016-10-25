@@ -10,9 +10,10 @@ raspimeters = {}
 def main(argv):
     simulated = False
     configure = False
+    usb = False
     
     try:
-        opts, args = getopt.getopt(argv, "h:sc")
+        opts, args = getopt.getopt(argv, "h:scu")
     
     except getopt.GetoptError:
         print 'runner.py -s <simulated>'
@@ -28,12 +29,15 @@ def main(argv):
             
         elif opt == '-c':
             configure = True
+            
+        elif opt == '-u':
+            usb = True
         
     
     camera_inputs = mdb.getCameraInputs()
     
     for camera_input in camera_inputs:
-        rm = Raspimeter(mdb, camera_input, simulated, configure)
+        rm = Raspimeter(mdb, camera_input, simulated, configure, usb)
         rm.start()
         raspimeters[camera_input.meter.id] = rm
 

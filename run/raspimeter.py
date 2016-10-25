@@ -25,7 +25,7 @@ class Raspimeter(threading.Thread):
     classdocs
     '''
    
-    def __init__(self, db, camera_input, simulated=True, configure=True):
+    def __init__(self, db, camera_input, simulated=True, configure=True, usb=False):
         '''
         Constructor
         TODO handle meter_id to load meter depended settings
@@ -46,9 +46,13 @@ class Raspimeter(threading.Thread):
             from inputs.simulated_camera import SimulatedCamera
             self.__camera = SimulatedCamera(self.__camera_input.camera_number, self.__camera_input.led_pin)
                 
-        else:
+        elif not usb:
             from inputs.camera import Camera
             self.__camera = Camera(self.__camera_input.camera_number, self.__camera_input.led_pin)
+        
+        else:
+            from inputs.usb_camera import USBCamera
+            self.__camera = USBCamera(0)
     
     
     def run(self):
