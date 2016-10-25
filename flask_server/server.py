@@ -3,8 +3,9 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import json
 
-from flask import request, send_from_directory, render_template
+from flask import request, send_from_directory, render_template, redirect
 from flask_mongoengine.wtf import model_form
+#from flask_wtf import Form
 from flask.ext.wtf import Form
 
 from flask_server import app 
@@ -16,17 +17,19 @@ import assets
 if __name__ == '__main__':
     app.run()
     
+    
 @app.route("/")
 def index():
     '''
     '''
+    if app.config["MONGODB_SETTINGS"]['DB'] == '':
+        return redirect("/settings", code=302)
+    
     meters = []
     
     for meter in db.getMeters():
         meters.append(meter)
         
-    # TODO if not configured return appConfig
-    
     return render_template('charts.html', meters=meters, show_charts=True)
 
 
@@ -70,6 +73,9 @@ def renderImagesWithPagination():
 def renderMeters():
     '''
     '''
+    if app.config["MONGODB_SETTINGS"]['DB'] == '':
+        return redirect("/settings", code=302)
+    
     meters = db.getMeters()
     
     return render_template('meters.html', meters=meters)
@@ -79,6 +85,18 @@ def renderMeters():
 def renderSettings():
     '''
     '''
+    name = request.form.get('name')
+    password = request.form.get('password') 
+    
+    if name is None:
+        name = app.config["MONGODB_SETTINGS"]['DB']
+        password = app.config["SECRET_KEY"]
+    
+    if name != '':
+        import flask_server
+        flask_server.updateDBConfig(name, password)
+        #TODO restart server app here
+    
     camera_inputs = db.getCameraInputs()
     input_forms = []
     
@@ -92,7 +110,7 @@ def renderSettings():
         
         input_forms.append(camera_input_form)
         
-    return render_template('settings.html', input_forms=input_forms)
+    return render_template('settings.html', input_forms=input_forms, name=name, password=password)
 
 
 @app.route("/get_meter", methods=['GET'])

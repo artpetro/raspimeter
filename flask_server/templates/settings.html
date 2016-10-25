@@ -1,5 +1,8 @@
 {% extends "index.html" %} {% block settings %}
 <ul class="meters-list">
+<li>
+{% include 'db_settings.html' %}
+</li>
 {% for input_form in input_forms %}
 	<li>
 		<div class="meter-container">
