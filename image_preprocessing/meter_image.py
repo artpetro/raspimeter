@@ -50,7 +50,7 @@ class MeterImage(object):
         return self.__meter
     
     
-    def storeImage(self, path, store_preview=False, store_rgb=True):
+    def storeImage(self, path, message='', store_preview=False, store_rgb=True):
         '''
         '''
         if store_rgb:
@@ -59,12 +59,32 @@ class MeterImage(object):
         else:
             image = self.__grayscaled_source_image
         
+        if message != '':
+            image = self.__putLabel(image, message)
+            
         cv2.imwrite(path, image)
         
         if store_preview:
             height, width = image.shape[:2]
-            resized = cv2.resize(image.copy(), (self.__image_width, int(100 * height / width)))
+            #TODO resize correctly
+            copy = image.copy()
+            resized = cv2.resize(copy, (self.__image_width, int(100 * height / width)))
             cv2.imwrite(path.replace('.png', '_preview.png'), resized)
+            
+    
+    def __putLabel(self, image, message):
+        height, width = image.shape[:2]
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        scale = 1
+        thickness = 2
+        pos = (10, 40)
+        size, baseline = cv2.getTextSize(message, font, scale, thickness)
+        cv2.rectangle(image, (pos[0], pos[1]+baseline),
+          (pos[0]+size[0], pos[1]-size[1]),
+          (0,0,255), -1);
+        cv2.putText(image, message, pos, font, scale, (255,255,255), thickness)
+            
+        return image
         
 
     def getGrayScaledSourceImage(self):

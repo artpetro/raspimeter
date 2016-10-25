@@ -28,7 +28,7 @@ class Raspimeter(threading.Thread):
     def __init__(self, db, camera_input, simulated=True):
         '''
         Constructor
-        TODO handle meter_id for load meter depended settings
+        TODO handle meter_id to load meter depended settings
         '''
         threading.Thread.__init__(self)
         meter = db.getMeter(camera_input.meter.id)
@@ -82,7 +82,7 @@ class Raspimeter(threading.Thread):
         self.__db.updateLastMeterCaptures(meter)
         
         image_name = '%s_last_meter_capture.png' % (meter.id)
-        meter_image.storeImage(ROOT_DIR + image_name, store_rgb=True)
+        meter_image.storeImage(ROOT_DIR + image_name, message='Running', store_rgb=True)
         meter.last_capture = image_name
         
         self.__db.updateWeather(meter, timestamp)
