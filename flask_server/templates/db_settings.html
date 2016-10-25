@@ -1,0 +1,24 @@
+<div class="meter-container">
+<div id="main-settings-container">
+<button id="main-settings-button">Database settings</button>
+			
+<form method="POST" action="/settings">
+	<ul class="settings-list">
+						
+		<li>
+		<label>Name</label> <input type="text" name="name" value={{ name }}>
+		</li>
+		<li>
+		<label>Password</label> <input type="text" name="password" value={{ password }}>
+		</li>
+	</ul>
+	<div class="settings-controls-container">
+		<div class="settings-image-container"></div>
+		<div class="settings-buttons-container">
+			<button id="database-settings-save-button" class="save-button">Save</button>
+		</div>
+	</div>
+</form>
+
+</div>
+</div>

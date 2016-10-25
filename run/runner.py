@@ -9,9 +9,10 @@ raspimeters = {}
 
 def main(argv):
     simulated = False
+    configure = False
     
     try:
-        opts, args = getopt.getopt(argv, "h:s")
+        opts, args = getopt.getopt(argv, "h:sc")
     
     except getopt.GetoptError:
         print 'runner.py -s <simulated>'
@@ -24,12 +25,15 @@ def main(argv):
 
         elif opt == '-s':
             simulated = True
+            
+        elif opt == '-c':
+            configure = True
         
     
     camera_inputs = mdb.getCameraInputs()
     
     for camera_input in camera_inputs:
-        rm = Raspimeter(mdb, camera_input, simulated)
+        rm = Raspimeter(mdb, camera_input, simulated, configure)
         rm.start()
         raspimeters[camera_input.meter.id] = rm
 

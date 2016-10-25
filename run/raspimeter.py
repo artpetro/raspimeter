@@ -25,7 +25,7 @@ class Raspimeter(threading.Thread):
     classdocs
     '''
    
-    def __init__(self, db, camera_input, simulated=True):
+    def __init__(self, db, camera_input, simulated=True, configure=True):
         '''
         Constructor
         TODO handle meter_id to load meter depended settings
@@ -40,6 +40,7 @@ class Raspimeter(threading.Thread):
         self.__meter_id = meter.id
         self.__knn = SingleDigitKNNRecogniser(self.__db, self.__meter_id)
         self.__camera_input = camera_input
+        self.__configure = configure
         
         if simulated:
             from inputs.simulated_camera import SimulatedCamera
@@ -53,16 +54,36 @@ class Raspimeter(threading.Thread):
     def run(self):
         '''
         '''
+        if self.__configure:
+            sleeptime = 3
+        else:
+            sleeptime = self.__camera_input.sleep_time
+        
         while True:
-            print"recognize"
             
             try:
-                self.takeAndRecognizeImage()
+                if self.__configure:
+                    print 'configure'
+                    self.takeAndStoreImage()
+                else:
+                    print 'recognize'
+                    self.takeAndRecognizeImage()
             
             except Exception as e:
                 traceback.print_exc()
                 
-            time.sleep(self.__camera_input.sleep_time)
+            time.sleep(sleeptime)
+            
+    def takeAndStoreImage(self):
+        '''
+        '''
+        meter = self.__camera_input.meter
+        image = self.__camera.capture()
+        meter_image = MeterImage(meter, image, ROOT_DIR)
+        meter_image.getDigits()
+        image_name = '%s_last_meter_capture.png' % (meter.id)
+        meter_image.storeImage(ROOT_DIR + image_name, message='Configure', store_rgb=True)
+        meter.last_capture = image_name
             
 
     def takeAndRecognizeImage(self):
