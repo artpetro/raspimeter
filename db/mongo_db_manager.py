@@ -669,19 +669,16 @@ if __name__ == '__main__':
     #MongoDataBaseManager.createMeterType('Gas Meter Type')
     #MongoDataBaseManager.createMeter('Gas Meter Type', 'Gas Meter')
     
-    MongoDataBaseManager.createCameraInput(12)
-    meter = Meter.objects(name='Gas Meter').first()
-    MongoDataBaseManager.setMeterForCameraInput(meter.id, 1)
+    #MongoDataBaseManager.createCameraInput(12)
+    #meter = Meter.objects(name='Gas Meter').first()
+    #MongoDataBaseManager.setMeterForCameraInput(meter.id, 1)
     
     API_KEY = '9d78daf127ad45a1d3f57f86e69accb4'
     position = 'Osnabrueck, Germany'
-    weather_settings = WeatherSettings(api_key=API_KEY, position=position)
-    weather_settings.save()
-
+    
     meter = Meter.objects().first()
     meter.meter_settings.weather_api_key = API_KEY
     meter.meter_settings.position = position
-     
     meter.meter_settings.condition_number = 0.9627
     meter.meter_settings.value_units = 'm^3'
     meter.meter_settings.calorific_value = 9.833
