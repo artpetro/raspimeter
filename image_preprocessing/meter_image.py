@@ -177,6 +177,8 @@ class MeterImage(object):
         based on https://www.kompf.de/cplus/emeocv.html, https://github.com/skaringa/emeocv/blob/master/ImageProcessor.cpp
         '''
         edges = self.__getCannyEdges()
+        # only two ret vals in opencv 2.* :
+        # contours, hierarchy = cv2.findContours(edges, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
         _, contours, hierarchy = cv2.findContours(edges, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
         # filter contours by bounding rect size
         filtered_contours, boundingBoxes = self.__filterContours(contours)
