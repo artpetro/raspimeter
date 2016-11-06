@@ -37,13 +37,22 @@ class MongoDataBaseManager():
         '''
     
     @staticmethod
-    def storeCameraInput(meter_id):
+    def createCameraInput(led_pin):
+        '''
+        '''
+        camera_input = CameraInput(led_pin=led_pin)
+        camera_input.save()
+    
+    
+    @staticmethod
+    def setMeterForCameraInput(meter_id, camera_number):
         '''
         '''
         meter = Meter.objects(id=meter_id).first()
-        camera_input = CameraInput(meter=meter)
+        camera_input = CameraInput.objects(camera_number=camera_number).first()
+        camera_input.meter = meter
         camera_input.save()
-        
+    
         
     @staticmethod
     def getCameraInputs():
@@ -655,29 +664,30 @@ class MongoDataBaseManager():
          
 if __name__ == '__main__':
 
-    MongoDataBaseManager.createMeterType('Gas Meter Type')
-    MongoDataBaseManager.createMeter('Gas Meter Type', 'Gas Meter')
-    pass
-    
     #MongoDataBaseManager.deleteAllSuccRecImages()
-    
 
-#     
-#     API_KEY = '9d78daf127ad45a1d3f57f86e69accb4'
-#     position = 'Osnabrueck, Germany'
-# #     weather_settings = WeatherSettings(api_key=API_KEY, position=position)
-# #     weather_settings.save()
-# 
-#     meter = Meter.objects().first()
-#     meter.meter_settings.weather_api_key = API_KEY
-#     meter.meter_settings.position = position
-#     
-#     meter.meter_settings.condition_number = 0.9627
-#     meter.meter_settings.value_units = 'm^3'
-#     meter.meter_settings.calorific_value = 9.833
-#     meter.meter_settings.unit_price = 0.09
-#     
-#     meter.save()
+    #MongoDataBaseManager.createMeterType('Gas Meter Type')
+    #MongoDataBaseManager.createMeter('Gas Meter Type', 'Gas Meter')
+    
+    MongoDataBaseManager.createCameraInput(12)
+    meter = Meter.objects(name='Gas Meter').first()
+    MongoDataBaseManager.setMeterForCameraInput(meter.id, 1)
+    
+    API_KEY = '9d78daf127ad45a1d3f57f86e69accb4'
+    position = 'Osnabrueck, Germany'
+    weather_settings = WeatherSettings(api_key=API_KEY, position=position)
+    weather_settings.save()
+
+    meter = Meter.objects().first()
+    meter.meter_settings.weather_api_key = API_KEY
+    meter.meter_settings.position = position
+     
+    meter.meter_settings.condition_number = 0.9627
+    meter.meter_settings.value_units = 'm^3'
+    meter.meter_settings.calorific_value = 9.833
+    meter.meter_settings.unit_price = 0.09
+    
+    meter.save()
     
     
 #     MeterValue.drop_collection() 

@@ -21,7 +21,7 @@ def main(argv):
       
     for opt, arg in opts:
         if opt == '-h':
-            print 'runner.py [-s]'
+            print 'runner.py [-s -c -u]'
             sys.exit()
 
         elif opt == '-s':
