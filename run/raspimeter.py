@@ -59,7 +59,7 @@ class Raspimeter(threading.Thread):
         '''
         '''
         if self.__configure:
-            sleeptime = 3
+            sleeptime = 10
         else:
             sleeptime = self.__camera_input.sleep_time
         
