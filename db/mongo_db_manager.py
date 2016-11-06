@@ -641,10 +641,24 @@ class MongoDataBaseManager():
         
         return map_f_pref + map_f_body + map_f_suff
          
+
+    @staticmethod
+    def createMeterType(name):
+        mt = MeterType(name)
+        mt.save()
+        
+    @staticmethod
+    def createMeter(meter_type_name, meter_name):
+        mt = MeterType.objects(name=meter_type_name).first()
+        MongoDataBaseManager.createAndStoreMeterAndSettings(meter_type_id=mt.id, name=meter_name)
+         
          
 if __name__ == '__main__':
 
+    MongoDataBaseManager.createMeterType('Gas Meter Type')
+    MongoDataBaseManager.createMeter('Gas Meter Type', 'Gas Meter')
     pass
+    
     #MongoDataBaseManager.deleteAllSuccRecImages()
     
 

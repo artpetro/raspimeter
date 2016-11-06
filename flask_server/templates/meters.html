@@ -28,13 +28,7 @@
 				</div>
 
 				<ul class="settings-list">
-						<!--  li><label for="input-type">Select input type</label> <select
-							name="input-type" id="input-type" >
-								<option id='none' selected="selected">None</option>
-								<option id='camera'>Camera</option>
-								<option id='pulse' disabled>Pulse sensor</option>
-								<option id='current' disabled>Current sensor</option>
-						</select></li--> 
+						 
 						{% for setting in meter.meter_settings %}
 						{% if setting != 'max_consumption_per_minute' %}
 						<li><label>{{ setting }}</label> <input type="textfield"

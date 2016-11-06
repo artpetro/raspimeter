@@ -9,7 +9,7 @@ from flask_mongoengine.wtf import model_form
 from flask.ext.wtf import Form
 
 from flask_server import app 
-from db.mongo_models import CameraInput
+from db.mongo_models import CameraInput, MeterSettings, MeterImageSettings
 from db.mongo_db_manager import MongoDataBaseManager as db
 from run.raspimeter import Raspimeter
 import assets
@@ -79,6 +79,52 @@ def renderMeters():
     meters = db.getMeters()
     
     return render_template('meters.html', meters=meters)
+
+@app.route("/meters_", methods=('GET', 'POST'))
+def renderMeters_():
+    '''
+    '''
+    if app.config["MONGODB_SETTINGS"]['DB'] == '':
+        return redirect("/settings", code=302)
+    
+    meters = []
+    
+    
+    for meter in db.getMeters():
+        meter_data = {}
+        meter_data['id'] = meter.id
+        meter_data['forms'] = []
+        
+        # meter settings
+        meter_settings = meter.meter_settings
+        MSForm = model_form(MeterSettings, Form)
+        meter_settings_form = MSForm(request.form, meter_settings)
+        meter_data['forms'].append(('settings', meter_settings_form))
+        
+        # meter_image_settings
+        meter_image_settings = meter.meter_image_settings
+        MISForm = model_form(MeterImageSettings, Form)
+        meter_image_settings_form = MISForm(request.form, meter_image_settings)
+        meter_data['forms'].append(('image_settings', meter_image_settings_form))
+        
+        if request.method == 'POST':
+            form_name = request.form['form-name']
+            
+            if form_name == 'settings' and meter_settings_form.validate_on_submit():
+                meter_settings_form.populate_obj(meter_settings)
+                meter_settings = meter_settings.save()
+                
+            elif form_name == 'image_settings' and meter_image_settings_form.validate_on_submit():
+                meter_image_settings_form.populate_obj(meter_image_settings)
+                meter_image_settings = meter_settings.save()
+        
+        
+        #TODO other settings
+        
+        meters.append(meter_data)
+        
+        
+    return render_template('meters_.html', meters=meters)
 
 
 @app.route("/settings", methods=('GET', 'POST'))

@@ -11,7 +11,7 @@ from flask_server import mongo_db_engine
 class MeterType(mongo_db_engine.Document):
     '''
     '''
-    name = mongo_db_engine.StringField(max_length=255, required=True)
+    name = mongo_db_engine.StringField(max_length=255, required=True, unique=True)
     
     
 class MeterSettings(mongo_db_engine.EmbeddedDocument):
@@ -26,8 +26,8 @@ class MeterSettings(mongo_db_engine.EmbeddedDocument):
     calorific_value = mongo_db_engine.FloatField(default = 1.0, required=True) # used to convert units to converted units m^3 -> kwh
     condition_number = mongo_db_engine.FloatField(default = 1.0, required=True)
     max_consumption_per_minute = mongo_db_engine.FloatField(default = 10.0, required=True)
-    weather_api_key = mongo_db_engine.StringField(max_length=255, required=True)
-    position = mongo_db_engine.StringField(max_length=255, required=True, unique=True)
+    weather_api_key = mongo_db_engine.StringField(default='***', max_length=255, required=True)
+    position = mongo_db_engine.StringField(default='***', max_length=255, required=True, unique=True)
     
 class MeterImageSettings(mongo_db_engine.EmbeddedDocument):
     '''
