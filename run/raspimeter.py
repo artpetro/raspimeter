@@ -87,6 +87,7 @@ class Raspimeter(threading.Thread):
         image_name = '%s_last_meter_capture.png' % (meter.id)
         meter_image.storeImage(ROOT_DIR + image_name, message='Configure', store_rgb=True)
         meter.last_capture = image_name
+        self.__db.updateLastMeterCaptures(meter)
         meter_image.getDigits()
             
 
@@ -104,11 +105,10 @@ class Raspimeter(threading.Thread):
                                               timestamp, 
                                               self.__camera_input.store_recognized_images,
                                               self.__camera_input.store_rgb_images)
-        self.__db.updateLastMeterCaptures(meter)
-        
         image_name = '%s_last_meter_capture.png' % (meter.id)
         meter_image.storeImage(ROOT_DIR + image_name, message='Running', store_rgb=True)
         meter.last_capture = image_name
+        self.__db.updateLastMeterCaptures(meter)
         
         self.__db.updateWeather(meter, timestamp)
 
