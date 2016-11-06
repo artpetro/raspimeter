@@ -791,11 +791,11 @@ $(function () {
 		var img = $("#last_meter_capture");
 		var src = img.attr("src").split('?')[0];
 	    img.attr("src", src + "?"+new Date().getTime());
-	},3000);
+	},10000);
 	
 	setInterval(function(){
 		var img = $("#last_knn_capture");
 		var src = img.attr("src").split('?')[0];
 	    img.attr("src", src + "?"+new Date().getTime());
-	},3000);
+	},10000);
 });
