@@ -83,6 +83,7 @@ class Raspimeter(threading.Thread):
         '''
         meter = self.__camera_input.meter
         image = self.__camera.capture()
+        print image
         meter_image = MeterImage(meter, image, ROOT_DIR)
         meter_image.getDigits()
         image_name = '%s_last_meter_capture.png' % (meter.id)
