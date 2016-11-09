@@ -1212,15 +1212,53 @@ $(function () {
 	}
 	
 	/* refresh imeges in settings view */
-	setInterval(function(){
-		var img = $("#last_meter_capture");
-		var src = img.attr("src");
-	    img.attr("src", src + "?"+new Date().getTime());
-	},3000);
+	if ($("#last_meter_capture").is(':visible')) {
+		setInterval(function(){
+			var img = $("#last_meter_capture");
+			var src = img.attr("src").split('?')[0];
+		    img.attr("src", src + "?"+new Date().getTime());
+		},10000);
+	}
 	
 	setInterval(function(){
 		var img = $("#last_knn_capture");
-		var src = img.attr("src");
+		var src = img.attr("src").split('?')[0];
 	    img.attr("src", src + "?"+new Date().getTime());
-	},3000);
+	},10000);
+	
+	// Settings Tabs
+	$( "#settings-tabs" ).tabs();
+	loadSettingsTab($( "#settings-tabs-1" ), "/db_settings");
+	loadSettingsTab($( "#settings-tabs-2" ), "/ci_settings");
+	
+	
+	function loadSettingsTab(tab, url) {
+		tab.load( url , function() {
+			saveSettingsButtonHandler(tab);
+		});
+	}
+	
+	function saveSettingsButtonHandler(tab) {
+		var form = tab.find("form");
+		var url = form.attr("action");
+		var btn = form.find(".save-button");
+		btn.click(function (e) {
+			
+			e.preventDefault();
+			$.ajax({
+			      type: 'POST',
+			      url: url,
+			      data: form.serialize(),
+			      success: function(response) {
+			    	  tab.html(response);
+			    	  saveSettingsButtonHandler(tab);
+			      },
+			      error: function() {
+			    	  alert("ERROR");
+			      }
+			    });
+		});
+	}
+	
+
 });

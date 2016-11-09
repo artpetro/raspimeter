@@ -1,0 +1,20 @@
+<div id="main-settings-container">
+	<form id="camera-input-settings-form" method="POST" action="/ci_settings">
+		<ul class="settings-list">
+			{{ input_form.hidden_tag() }} {% for field in input_form if
+			field.widget.input_type != 'hidden' %}
+			<li><label>{{ field.label }}</label> {{ field }} 
+			{% if field.errors %}
+				<ul class="errors">
+					{% for error in field.errors %}
+					<li>{{ error }}</li> {% endfor %}
+				</ul> {% endif %}</li> {% endfor %}
+		</ul>
+		<div class="settings-controls-container">
+			<div class="settings-image-container"></div>
+				<div class="settings-buttons-container">
+					<button id="database-settings-save-button" class="save-button">Save</button>
+			</div>
+		</div>
+	</form>
+</div>

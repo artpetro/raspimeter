@@ -74,8 +74,8 @@ class CameraInput(mongo_db_engine.Document):
     meter = mongo_db_engine.ReferenceField(Meter)
     camera_number = mongo_db_engine.IntField(default=1, max_length=1, required=True, unique=True)
     led_pin = mongo_db_engine.IntField(default=12, max_length=2, required=True)
-    store_recognized_images = mongo_db_engine.BooleanField(default=True, required=True)
-    store_rgb_images = mongo_db_engine.BooleanField(default=True, required=True)
+    store_recognized_images = mongo_db_engine.BooleanField(default=True)
+    store_rgb_images = mongo_db_engine.BooleanField(default=True)
     sleep_time = mongo_db_engine.IntField(default=60, required=True)
     
     

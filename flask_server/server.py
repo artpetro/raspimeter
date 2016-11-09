@@ -131,8 +131,40 @@ def renderMeters_():
 def renderSettings():
     '''
     '''
+#     camera_inputs = db.getCameraInputs()
+#     for camera_input in camera_inputs:
+    # TODO pass list with all camera inputs to template
+        
+    return render_template('settings.html')
+
+
+@app.route("/ci_settings", methods=('GET', 'POST'))
+def renderCiSettings():
+    '''
+    '''
+    # TODO select ci by id in request
+    camera_input = db.getCameraInputs().first()
+    
+    CameraInputForm = model_form(CameraInput, Form)
+    camera_input_form = CameraInputForm(request.form, camera_input)
+    
+    if camera_input_form.validate_on_submit():
+        camera_input_form.populate_obj(camera_input)
+        camera_input = camera_input.save()
+        
+        
+    return render_template('camera_input_settings.html', input_form=camera_input_form)
+
+
+@app.route("/db_settings", methods=('GET', 'POST'))
+def renderatDatabaseSettings():
+    '''
+    '''
     name = request.form.get('name')
     password = request.form.get('password') 
+    
+    print name
+    print password
     
     if name is None:
         name = app.config["MONGODB_SETTINGS"]['DB']
@@ -142,21 +174,8 @@ def renderSettings():
         import flask_server
         flask_server.updateDBConfig(name, password)
         #TODO restart server app here
-    
-    camera_inputs = db.getCameraInputs()
-    input_forms = []
-    
-    for camera_input in camera_inputs:
-        CameraInputForm = model_form(CameraInput, Form)
-        camera_input_form = CameraInputForm(request.form, camera_input)
-    
-        if camera_input_form.validate_on_submit():
-            camera_input_form.populate_obj(camera_input)
-            camera_input = camera_input.save()
         
-        input_forms.append(camera_input_form)
-        
-    return render_template('settings.html', input_forms=input_forms, name=name, password=password)
+    return render_template('db_settings.html', name=name, password=password)
 
 
 @app.route("/get_meter", methods=['GET'])

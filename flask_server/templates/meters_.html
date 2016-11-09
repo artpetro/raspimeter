@@ -1,26 +1,17 @@
-{% extends "index.html" %} {% block settings %}
-
-<div id="settings-tabs">
-  <ul>
-    <li><a href="#settings-tabs-1">Database Settings</a></li>
-    <li><a href="#settings-tabs-2">Camera Input Settings</a></li>
-  </ul>
-  <div id="settings-tabs-1">
-  </div>
-  <div id="settings-tabs-2">
-  </div>
-</div>
-
-<!-- 
+{% extends "index.html" %} 
+{% block meters %}
 <ul class="meters-list">
-{% for input_form in input_forms %}
+{% for meter_data in meters %}
+	{% for input_form in meter_data['forms'] %}
+
 	<li>
 		<div class="meter-container">
-			<button id="main-settings-button">System settings</button>
+		<button id="main-settings-button">{{ input_form[0] }}</button>
 			<div id="main-settings-container">
-				<form method="POST" action="/settings">
+				<form method="POST" action="/meters_">
+					<input type="hidden" name="form-name" value="{{ input_form[0] }}">
 					<ul class="settings-list">
-						{{ input_form.hidden_tag() }} {% for field in input_form if
+						{{ input_form[1].hidden_tag() }} {% for field in input_form[1] if
 						field.widget.input_type != 'hidden' %}
 						<li><label>{{ field.label }}</label> {{ field }} 
 						{% if field.errors %}
@@ -40,6 +31,6 @@
 		</div>
 	</li>
 	{% endfor %}
+{% endfor %}
 </ul>
- -->
 {% endblock %}

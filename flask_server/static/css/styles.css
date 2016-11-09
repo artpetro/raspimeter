@@ -739,6 +739,21 @@ input[type=number]::-webkit-outer-spin-button {
     margin-top: 1em;
 }
 
+.settings-buttons-container button {
+	border-radius: 6px;
+    background-color: #87bae1;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.12);
+    border: 0;
+    color: #ffffff;
+    font-weight: bold;
+    font-size: 1em;
+    cursor: pointer;
+    width: 100%;
+    height: 2.5em;
+    margin-bottom: 1em;
+    margin-top: 1em;
+}
+
 .invisible-settings-container {
 	display: none;
 }
