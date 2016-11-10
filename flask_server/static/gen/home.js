@@ -432,9 +432,28 @@ $(function () {
 	loadSettingsTab($( "#meter-tabs-knn-settings" ), "/knn_settings");
 	
 	var meterId = $( "#meter-tabs" ).attr("meter_id");
-	$( "#meter-tabs-images" ).load("/images_?meter_id=" + meterId, function() {
-		images();
-	});
+	var tab = $( "#meter-tabs-images" );
+	
+	loadImagesTab(tab, meterId, 1, -1);
+	
+	function loadImagesTab(tab, meterId, page, flag) {
+		
+		tab.load("/images?meter_id=" + meterId + "&flag=" + flag + "&page=" + page, function() {
+			images();
+			$('.pagination > a').each(function() {
+				//console.log($(this));
+				$(this).attr("href", "#");
+			})
+			$('.pagination > a').click(function(event) {
+			    event.preventDefault();
+			    var page = $(event.target).text();
+			    loadImagesTab(tab, meterId, page, flag);
+			});
+		});	
+	}
+	
+	
+	
 	
 	// Settings Tabs
 	$( "#settings-tabs" ).tabs();
@@ -469,6 +488,7 @@ $(function () {
 			    });
 		});
 	}
+	
 	
 	function images() {
 		
@@ -875,7 +895,7 @@ $(function () {
 	
 });
 $(function () {
-// Initial variables for chart-container
+    // Initial variables for chart-container
 	// date for charts for MySQL: "YYYY-MM-DD HH:MM:SS"
 	var period = 'd';
 		
