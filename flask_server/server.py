@@ -9,7 +9,7 @@ from flask_mongoengine.wtf import model_form
 from flask.ext.wtf import Form
 
 from flask_server import app 
-from db.mongo_models import CameraInput, MeterSettings, MeterImageSettings
+from db.mongo_models import CameraInput, MeterSettings, MeterImageSettings, KNNSettings
 from db.mongo_db_manager import MongoDataBaseManager as db
 from run.raspimeter import Raspimeter
 import assets
@@ -32,18 +32,6 @@ def index():
         
     return render_template('charts.html', meters=meters, show_charts=True)
 
-
-@app.route("/images_all", methods=['GET'])
-def renderImages_TMP():
-    '''
-    '''
-    # Get data from fields
-    meter_id = db.getMeters()[0].id#request.args.get('meter_id')
-    flag = request.args.get('flag') 
-
-    images = db.getImages(meter_id=meter_id, flag=int(flag))
-
-    return render_template('images_all.html', images=images, meter_id=meter_id)
 
 @app.route("/images", methods=['GET'])
 def renderImagesWithPagination():
@@ -69,62 +57,68 @@ def renderImagesWithPagination():
     
     return render_template('images.html', meter_id=meter_id, pagination=pagination, flag=flag, flags=flags, endpoint='renderImagesWithPagination')
 
-@app.route("/meters", methods=['GET'])
-def renderMeters():
-    '''
-    '''
-    if app.config["MONGODB_SETTINGS"]['DB'] == '':
-        return redirect("/settings", code=302)
-    
-    meters = db.getMeters()
-    
-    return render_template('meters.html', meters=meters)
 
-@app.route("/meters_", methods=('GET', 'POST'))
+@app.route("/meters", methods=('GET', 'POST'))
 def renderMeters_():
     '''
     '''
     if app.config["MONGODB_SETTINGS"]['DB'] == '':
         return redirect("/settings", code=302)
     
-    meters = []
+    return render_template('meters.html', meters=db.getMeters())
+
+
+@app.route("/meter_settings", methods=('GET', 'POST'))
+def renderMeterSettings():
+    '''
+    '''
+    # TODO select meter by id in request
+    meter = db.getMeters().first()
+    meter_settings = meter.meter_settings
+    MSForm = model_form(MeterSettings, Form)
+    meter_settings_form = MSForm(request.form, meter_settings)
     
+    if meter_settings_form.validate_on_submit():
+        meter_settings_form.populate_obj(meter_settings)
+        meter_settings.save()
+        
+    return render_template('meter_settings.html', meter=meter, input_form=meter_settings_form)
+
+
+@app.route("/meter_image_settings", methods=('GET', 'POST'))
+def renderMeterImageSettings():
+    '''
+    '''
+    # TODO select meter by id in request
+    meter = db.getMeters().first()
     
-    for meter in db.getMeters():
-        meter_data = {}
-        meter_data['id'] = meter.id
-        meter_data['forms'] = []
+    meter_image_settings = meter.meter_image_settings
+    MISForm = model_form(MeterImageSettings, Form)
+    meter_image_settings_form = MISForm(request.form, meter_image_settings)
+
+    if meter_image_settings_form.validate_on_submit():
+        meter_image_settings_form.populate_obj(meter_image_settings)
+        meter_image_settings.save()
         
-        # meter settings
-        meter_settings = meter.meter_settings
-        MSForm = model_form(MeterSettings, Form)
-        meter_settings_form = MSForm(request.form, meter_settings)
-        meter_data['forms'].append(('settings', meter_settings_form))
+    return render_template('meter_image_settings.html', meter=meter, input_form=meter_image_settings_form)
+
+
+@app.route("/knn_settings", methods=('GET', 'POST'))
+def renderKNNSettings():
+    '''
+    '''
+    # TODO select meter by id in request
+    meter = db.getMeters().first()
+    
+    knn_settings = meter.knn_settings
+    KNNSForm = model_form(KNNSettings, Form)
+    knn_settings_form = KNNSForm(request.form, knn_settings)
+
+    if knn_settings_form.validate_on_submit():
+        knn_settings_form.populate_obj(knn_settings)
+        knn_settings.save()
         
-        # meter_image_settings
-        meter_image_settings = meter.meter_image_settings
-        MISForm = model_form(MeterImageSettings, Form)
-        meter_image_settings_form = MISForm(request.form, meter_image_settings)
-        meter_data['forms'].append(('image_settings', meter_image_settings_form))
-        
-        if request.method == 'POST':
-            form_name = request.form['form-name']
-            
-            if form_name == 'settings' and meter_settings_form.validate_on_submit():
-                meter_settings_form.populate_obj(meter_settings)
-                meter_settings = meter_settings.save()
-                
-            elif form_name == 'image_settings' and meter_image_settings_form.validate_on_submit():
-                meter_image_settings_form.populate_obj(meter_image_settings)
-                meter_image_settings = meter_settings.save()
-        
-        
-        #TODO other settings
-        
-        meters.append(meter_data)
-        
-        
-    return render_template('meters_.html', meters=meters)
+    return render_template('knn_settings.html', meter=meter, input_form=knn_settings_form)
 
 
 @app.route("/settings", methods=('GET', 'POST'))

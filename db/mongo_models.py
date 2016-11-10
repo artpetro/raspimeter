@@ -50,7 +50,7 @@ class KNNSettings(mongo_db_engine.EmbeddedDocument):
     '''
     used for image recognition
     '''
-    trained = mongo_db_engine.BooleanField(default=False, required=True)
+    trained = mongo_db_engine.BooleanField(default=False)
     images_to_train = mongo_db_engine.IntField(default=10, required=True)
     knn_sample_size = mongo_db_engine.IntField(default=10, required=True)
     knn_neghtbors = mongo_db_engine.IntField(default=3, required=True)

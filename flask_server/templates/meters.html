@@ -1,102 +1,32 @@
 {% extends "index.html" %} 
 {% block meters %}
-	<ul class="meters-list">
-		{% for meter in meters %}
-		<li id="meter-li-{{ meter.id }}">
-			<div class="meter-container">
-				<a href="/images?meter_id={{ meter.id }}&flag=-1"><h2>{{ meter.name }}</h2></a>
-				<div class="meter-status">
-					<!-- TODO last image, if input camera
-						last value, link to images, #not recognized, status(if input camera): [trained/not trained]  -->
-				</div>
-
-				<button id="meter-settings-button">Meter settings</button>
-				<div id="meter-settings-container"
-					class="invisible-settings-container">
-
-				<div class="settings-controls-container">
-					<div class="settings-image-container">
-						<img id="last_meter_capture" src="static/images/{{ meter.last_capture }}" width="300"
-							height="200"></img>
-					</div>
-					<div class="settings-buttons-container">
-						<button id="meter-settings-test-button" class="test-button">Test
-							meter settings</button>
-						<button id="meter-settings-save-button" class="save-button">Save
-							meter settings</button>
-					</div>
-				</div>
-
-				<ul class="settings-list">
-						 
-						{% for setting in meter.meter_settings %}
-						{% if setting != 'max_consumption_per_minute' %}
-						<li><label>{{ setting }}</label> <input type="textfield"
-							name="{{ setting }}" value="{{ meter.meter_settings[setting] }}">
-						</li> 
-						{% endif %}
-						{% endfor %}
-						
-					</ul>
-				</div>
-
-				<button id="meter-image-settings-button">Meter image settings</button>
-				<div id="meter-image-settings-container" class="invisible-settings-container">
-					
-					<div class="settings-controls-container">
-						<div class="settings-image-container">
-							<img id="last_knn_capture" src="static/images/last_knn_capture.png" width="300"
-								height="200"></img>
-						</div>
-						<div class="settings-buttons-container">
-							<button id="meter-image-settings-test-button" class="test-button">Test
-								image settings</button>
-							<button id="meter-image-settings-save-button" class="save-button">Save
-								image settings</button>
-						</div>
-					</div>
-
-					<ul class="settings-list">
-						{% for setting in meter.meter_image_settings %}
-						{% if setting != 'images_to_train' %}
-						<li><label>{{ setting }}</label> <input type="textfield"
-							name="{{ setting }}"
-							value="{{ meter.meter_image_settings[setting] }}"></li>
-						{% endif %} 
-						{% endfor %}
-
-					</ul>
-				</div>
-
-				<button id="knn-settings-button">Digit recognition settings</button>
-				<div id="knn-settings-container" class="invisible-settings-container">
-					
-					<div class="settings-controls-container">
-						<div class="settings-image-container">
-							<!-- img src="static/images/last_knn_capture.png" width="300"
-								height="200"></img-->
-						</div>
-						<div class="settings-buttons-container">
-							<button id="knn-settings-test-button" class="test-button">Test
-								OCR settings</button>
-							<button id="knn-settings-save-button" class="save-button">Save
-								OCR settings</button>
-						</div>
-					</div>
-					
-					<ul class="settings-list">
-						{% for setting in meter.knn_settings %}
-						<li><label>{{ setting }}</label> <input type="textfield"
-							name="{{ setting }}" value="{{ meter.knn_settings[setting] }}">
-						</li> 
-						{% endfor %}
-
-					</ul>
-				</div>
-				
-				
-			</div>
-		</li> 
-		{% endfor %}
-	</ul>
+<div id="meter-tabs">
+  <ul>
+    <li><a href="#meter-tabs-images">Images</a></li>
+    <li><a href="#meter-tabs-values">Values</a></li>
+    <li><a href="#meter-tabs-meter-settings">Meter Settings</a></li>
+    <li><a href="#meter-tabs-meter-image-settings">Meter Image Settings</a></li>
+    <li><a href="#meter-tabs-knn-settings">KNN Settings</a></li>
+    <li><a href="#meter-tabs-knn-data">KNN Data</a></li>
+    <li><a href="#meter-tabs-energy-prices">Energy Prices</a></li>
+  </ul>
+  <div id="meter-tabs-images">
+  
+  
+  
+  
+  </div>
+  <div id="meter-tabs-values">
+  </div>
+  <div id="meter-tabs-meter-settings">
+  </div>
+  <div id="meter-tabs-meter-image-settings">
+  </div>
+  <div id="meter-tabs-knn-settings">
+  </div>
+  <div id="meter-tabs-knn-data">
+  </div>
+  <div id="meter-tabs-energy-prices">
+  </div>
+</div>
 {% endblock %}

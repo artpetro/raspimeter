@@ -26,7 +26,7 @@ def updateDBConfig(name, password):
     initMongoEngine(name, password)
 
 
-
+# TODO check if not config
 #config = ConfigParser.ConfigParser()
 #config.read('db/config.cfg')
 

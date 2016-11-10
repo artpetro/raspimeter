@@ -749,7 +749,7 @@ $(function () {
 	
 
 	
-	/***  METER SETTINGS ***/
+	/***  METER SETTINGS 
 	$('[id*=settings-button]').click(function() {	
 		runEffect($(this).attr('id'));
 	});	
@@ -775,6 +775,8 @@ $(function () {
 		
 	}
 	
+	***/
+	
 	function convertUTCDateToLocalDate(date) {
 	    var newDate = new Date(date.getTime()+date.getTimezoneOffset()*60*1000);
 
@@ -786,22 +788,15 @@ $(function () {
 	    return newDate;   
 	}
 	
-	/* refresh imeges in settings view */
-	if ($("#last_meter_capture").is(':visible')) {
-		setInterval(function(){
-			var img = $("#last_meter_capture");
-			var src = img.attr("src").split('?')[0];
-		    img.attr("src", src + "?"+new Date().getTime());
-		},10000);
-	}
 	
-	if ($("#last_knn_capture").is(':visible')) {
-		setInterval(function(){
-			var img = $("#last_knn_capture");
-			var src = img.attr("src").split('?')[0];
-		    img.attr("src", src + "?"+new Date().getTime());
-		},10000);
-	}
+	// Meter Tabs
+	$( "#meter-tabs" ).tabs();
+	loadSettingsTab($( "#meter-tabs-meter-settings" ), "/meter_settings");
+	loadSettingsTab($( "#meter-tabs-meter-image-settings" ), "/meter_image_settings");
+	loadSettingsTab($( "#meter-tabs-knn-settings" ), "/knn_settings");
+	
+	//$( "#meter-tabs-knn-settings" ).load();
+	
 	
 	// Settings Tabs
 	$( "#settings-tabs" ).tabs();
@@ -836,6 +831,4 @@ $(function () {
 			    });
 		});
 	}
-	
-
 });

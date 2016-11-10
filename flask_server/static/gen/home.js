@@ -1211,20 +1211,12 @@ $(function () {
 	    return newDate;   
 	}
 	
-	/* refresh imeges in settings view */
-	if ($("#last_meter_capture").is(':visible')) {
-		setInterval(function(){
-			var img = $("#last_meter_capture");
-			var src = img.attr("src").split('?')[0];
-		    img.attr("src", src + "?"+new Date().getTime());
-		},10000);
-	}
 	
-	setInterval(function(){
-		var img = $("#last_knn_capture");
-		var src = img.attr("src").split('?')[0];
-	    img.attr("src", src + "?"+new Date().getTime());
-	},10000);
+	// Meter Tabs
+	$( "#meter-tabs" ).tabs();
+	loadSettingsTab($( "#meter-tabs-meter-settings" ), "/meter_settings");
+	loadSettingsTab($( "#meter-tabs-meter-image-settings" ), "/meter_image_settings");
+	loadSettingsTab($( "#meter-tabs-knn-settings" ), "/knn_settings");
 	
 	// Settings Tabs
 	$( "#settings-tabs" ).tabs();
@@ -1259,6 +1251,4 @@ $(function () {
 			    });
 		});
 	}
-	
-
 });

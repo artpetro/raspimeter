@@ -1,0 +1,33 @@
+<div id="main-settings-container">
+	<div class="settings-image-container">
+		<img id="last_meter_capture" src="static/images/{{ meter.last_capture }}" width="300"
+							height="200"></img>
+	</div>
+	<form id="meter-settings-form" method="POST" action="/meter_settings">
+		<ul class="settings-list">
+			{{ input_form.hidden_tag() }} {% for field in input_form if
+			field.widget.input_type != 'hidden' %}
+			<li><label>{{ field.label }}</label> {{ field }} 
+			{% if field.errors %}
+				<ul class="errors">
+					{% for error in field.errors %}
+					<li>{{ error }}</li> {% endfor %}
+				</ul> {% endif %}</li> {% endfor %}
+		</ul>
+		<div class="settings-buttons-container">
+			<!-- button id="meter-settings-test-button" class="test-button">Test
+				meter settings</button-->
+			<button id="meter-settings-save-button" class="save-button">Save</button>
+		</div>
+	</form>
+</div>
+
+<script>
+if ($("#last_meter_capture").is(':visible')) {
+	setInterval(function(){
+		var img = $("#last_meter_capture");
+		var src = img.attr("src").split('?')[0];
+	    img.attr("src", src + "?"+new Date().getTime());
+	},10000);
+}
+</script>
