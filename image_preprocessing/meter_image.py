@@ -68,7 +68,7 @@ class MeterImage(object):
             height, width = image.shape[:2]
             #TODO resize correctly
             copy = image.copy()
-            resized = cv2.resize(copy, (self.__image_width, int(100 * height / width)))
+            resized = cv2.resize(copy, (int(width / 4), int(height / 4)))
             cv2.imwrite(path.replace('.png', '_preview.png'), resized)
             
     

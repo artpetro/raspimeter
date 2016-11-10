@@ -50,5 +50,19 @@
 			<div class="highlight"></div>
 		</li> {% endfor %}
 	</ul>
+	
+	<div class=pagination>
+        {% for page in pagination.iter_pages() %}
+            {% if page %}
+                {% if page != pagination.page %}
+                    <a href="{{ url_for(endpoint, meter_id=meter_id, flag=flag, page=page) }}">{{ page }}</a>
+                {% else %}
+                    <strong>{{ page }}</strong>
+                {% endif %}
+            {% else %}
+                <span class=ellipsis>...</span>
+            {% endif %}
+        {% endfor %}
+    </div>
 </div>
 

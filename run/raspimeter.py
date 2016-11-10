@@ -141,7 +141,6 @@ class Raspimeter(threading.Thread):
         meter_value_id = db.storeMeterValue(meter.id, timestamp, flag, numeric_value)
             
         if (store_recognized_images and flag == VALIDE_VALUE) or flag != VALIDE_VALUE:
-            # TODO rgb / grayScale
             image_name = '%s_%s_%s.png' % (timestamp.strftime(DATE_FORMAT),
                                             meter.id,
                                             meter_value_id)
