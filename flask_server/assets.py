@@ -10,6 +10,7 @@ bundles = {
     'js': Bundle(
   
         'js/lib/jquery-2.2.4.min.js',
+        'js/lib/jquery.tablesorter.min.js',
         'js/lib/jquery-ui.min.js',
         'js/lib/moment-with-locales.min.js',
         'js/lib/jquery.comiseo.daterangepicker.min.js',
@@ -18,8 +19,6 @@ bundles = {
         'js/raspimeter.js',
         'js/charts.js',
         output='gen/home.js'),
-           
-           
  
     'css': Bundle(
     

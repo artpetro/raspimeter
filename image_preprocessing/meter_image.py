@@ -203,8 +203,9 @@ class MeterImage(object):
             for br in alignedBoundingBoxes:
                 x,y,w,h = br
                 cv2.rectangle(copy, (x, y), (x + w, y + h), (255, 255, 255), 1)
-                
-            cv2.imwrite(self.__root_dir + 'last_knn_capture.png', copy)
+             
+            image_name = '%s_last_knn_capture.png' % (self.__meter.id)    
+            cv2.imwrite(self.__root_dir + image_name, copy)
             
         if show_aligned_boxes:
             copy = self.__grayscaled_source_image.copy()

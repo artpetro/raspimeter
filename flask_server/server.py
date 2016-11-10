@@ -51,11 +51,36 @@ def renderImagesWithPagination():
     except TypeError:
         page = 1
     
-    pagination = db.getImagesWithPagination(meter_id=meter_id, flag=flag, page=page, per_page=20)
+    pagination = db.getImagesWithPagination(meter_id=meter_id, image_requiered=True, flag=flag, page=page, per_page=20)
     
     flags = ["OK", "RNV", "NT", "IV", "DNR", "NED", "D", "PE"]
     
     return render_template('images.html', meter_id=meter_id, pagination=pagination, flag=flag, flags=flags, endpoint='renderImagesWithPagination')
+
+
+@app.route("/values", methods=['GET'])
+def renderValuesWithPagination():
+    '''
+    '''
+    # Get data from fields
+    meter_id = request.args.get('meter_id')
+    try:
+        flag = int(request.args.get('flag'))
+    
+    except TypeError:
+        flag = -1 #ALL_VALUES
+        
+    try: 
+        page = int(request.args.get('page'))
+    
+    except TypeError:
+        page = 1
+    
+    pagination = db.getImagesWithPagination(meter_id=meter_id, image_requiered=False, flag=flag, page=page, per_page=100)
+    
+    flags = ["OK", "RNV", "NT", "IV", "DNR", "NED", "D", "PE"]
+    
+    return render_template('values.html', meter_id=meter_id, pagination=pagination, flag=flag, flags=flags, endpoint='renderValuesWithPagination')
 
 
 @app.route("/meters", methods=('GET', 'POST'))

@@ -189,12 +189,16 @@ class MongoDataBaseManager():
         return images_list
     
     @staticmethod
-    def getImagesWithPagination(meter_id=1, flag=ALL_VALUES, page=1, per_page=10):
+    def getImagesWithPagination(meter_id=1, image_requiered=True, flag=ALL_VALUES, page=1, per_page=10):
         '''
         '''
         meter = Meter.objects(id=meter_id).first()
         
-        meter_values = MeterValue.objects(has_image=True, meter=meter) if flag == ALL_VALUES else MeterValue.objects(has_image=True, flag=flag, meter=meter)
+        if image_requiered:
+            meter_values = MeterValue.objects(has_image=True, meter=meter) if flag == ALL_VALUES else MeterValue.objects(has_image=True, flag=flag, meter=meter)
+
+        else:
+            meter_values = MeterValue.objects(meter=meter) if flag == ALL_VALUES else MeterValue.objects(flag=flag, meter=meter)
 
         return meter_values.paginate(page=page, per_page=per_page)
                   
@@ -274,11 +278,12 @@ class MongoDataBaseManager():
         
         
     @staticmethod
-    def deleteAllSuccRecImages():
+    def deleteAllSuccRecImages(meter_id):
         '''
-        tmp method to remove all successfull recognized images from file system 
+        method to remove all success full recognized images from file system 
         '''
-        meter_values = MeterValue.objects(flag=VALIDE_VALUE)
+        meter = Meter.objects(id=meter_id).first()
+        meter_values = MeterValue.objects(meter=meter, flag=VALIDE_VALUE)
         
         for meter_value in meter_values:
             meter_value.update(set__has_image=False)
@@ -286,9 +291,7 @@ class MongoDataBaseManager():
             image_name = "%s_%s_%s.png" % (timestamp.strftime('%Y-%m-%d_%H-%M-%S'), meter_value.meter.id, meter_value.id)
             from run.raspimeter import Raspimeter
             Raspimeter.deleteImage(image_name)
-            
-        
-     
+
 
     @staticmethod
     def updatePeriodicConsumptions(date, meter):

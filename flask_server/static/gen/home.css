@@ -2167,3 +2167,50 @@ input[type=number]::-webkit-outer-spin-button {
 	font-size: 40px;
 }
 
+/***  TABLE ***/
+
+#values {
+  margin: 0 auto;
+  font-size: 1.2em;
+  margin-bottom: 15px;
+}
+
+
+#values thead {
+  cursor: pointer;
+  background: #c9dff0;
+}
+#values thead tr th { 
+  font-weight: bold;
+  padding: 12px 30px;
+  padding-left: 42px;
+}
+#values thead tr th span { 
+  padding-right: 20px;
+  background-repeat: no-repeat;
+  background-position: 100% 100%;
+}
+
+#values thead tr th.headerSortUp, #values thead tr th.headerSortDown {
+  background: #acc8dd;
+}
+
+#values thead tr th.headerSortUp span {
+  background-image: url('up-arrow.png');
+}
+#values thead tr th.headerSortDown span {
+  background-image: url('down-arrow.png');
+}
+
+
+#values tbody tr { 
+  color: #555;
+}
+#values tbody tr td {
+  text-align: center;
+  padding: 15px 10px;
+}
+#values tbody tr td.lalign {
+  text-align: left;
+}
+

@@ -1,0 +1,52 @@
+<div class="all-values page">
+	
+	<div class=pagination>
+        {% for page in pagination.iter_pages() %}
+            {% if page %}
+                {% if page != pagination.page %}
+                    <a href="{{ url_for(endpoint, meter_id=meter_id, flag=flag, page=page) }}">{{ page }}</a>
+                {% else %}
+                    <strong>{{ page }}</strong>
+                {% endif %}
+            {% else %}
+                <span class=ellipsis>...</span>
+            {% endif %}
+        {% endfor %}
+    </div>
+    
+	<table id="values" cellspacing="0" cellpadding="0">
+    <thead>
+      <tr>
+        <th><span>Date</span></th>
+        <th><span>Value</span></th>
+        <th><span>Flag</span></th>
+        <th><span>Has image</span></th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for item in pagination.items %}
+      <tr>
+        <td class="lalign">{{ item.timestamp }}</td>
+        <td>{{ item.numeric_value }}</td>
+        <td>{{ flags[item.flag] }}</td>
+        <td>{{ item.has_image }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+	
+	<div class=pagination>
+        {% for page in pagination.iter_pages() %}
+            {% if page %}
+                {% if page != pagination.page %}
+                    <a href="{{ url_for(endpoint, meter_id=meter_id, flag=flag, page=page) }}">{{ page }}</a>
+                {% else %}
+                    <strong>{{ page }}</strong>
+                {% endif %}
+            {% else %}
+                <span class=ellipsis>...</span>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+

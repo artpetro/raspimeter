@@ -78,8 +78,10 @@ class Raspimeter(threading.Thread):
                 
             time.sleep(sleeptime)
             
+    
     def takeAndStoreImage(self):
         '''
+        used for configuration run
         '''
         meter = self.__camera_input.meter
         image = self.__camera.capture()

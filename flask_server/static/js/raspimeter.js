@@ -7,13 +7,13 @@ $(function () {
 	loadSettingsTab($( "#meter-tabs-knn-settings" ), "/knn_settings");
 	
 	var meterId = $( "#meter-tabs" ).attr("meter_id");
-	var tab = $( "#meter-tabs-images" );
 	
-	loadImagesTab(tab, meterId, 1, -1);
+	loadImagesTab($( "#meter-tabs-images" ), '/images',  meterId, 1, -1);
+	loadImagesTab($( "#meter-tabs-values" ), '/values',  meterId, 1, -1);
 	
-	function loadImagesTab(tab, meterId, page, flag) {
+	function loadImagesTab(tab, url, meterId, page, flag) {
 		
-		tab.load("/images?meter_id=" + meterId + "&flag=" + flag + "&page=" + page, function() {
+		tab.load(url + "?meter_id=" + meterId + "&flag=" + flag + "&page=" + page, function() {
 			images();
 			$('.pagination > a').each(function() {
 				//console.log($(this));
@@ -22,7 +22,7 @@ $(function () {
 			$('.pagination > a').click(function(event) {
 			    event.preventDefault();
 			    var page = $(event.target).text();
-			    loadImagesTab(tab, meterId, page, flag);
+			    loadImagesTab(tab, url, meterId, page, flag);
 			});
 		});	
 	}
