@@ -57,15 +57,39 @@ def renderImagesWithPagination():
     
     return render_template('images.html', meter_id=meter_id, pagination=pagination, flag=flag, flags=flags, endpoint='renderImagesWithPagination')
 
+@app.route("/images_", methods=['GET'])
+def renderImagesWithPagination_():
+    '''
+    '''
+    # Get data from fields
+    meter_id = request.args.get('meter_id')
+    try:
+        flag = int(request.args.get('flag'))
+    
+    except TypeError:
+        flag = -1 #ALL_VALUES
+        
+    try: 
+        page = int(request.args.get('page'))
+    
+    except TypeError:
+        page = 1
+    
+    pagination = db.getImagesWithPagination(meter_id=meter_id, flag=flag, page=page, per_page=20)
+    
+    flags = ["OK", "RNV", "NT", "IV", "DNR", "NED", "D", "PE"]
+    
+    return render_template('images_.html', meter_id=meter_id, pagination=pagination, flag=flag, flags=flags, endpoint='renderImagesWithPagination_')
+
 
 @app.route("/meters", methods=('GET', 'POST'))
-def renderMeters_():
+def renderMeters():
     '''
     '''
     if app.config["MONGODB_SETTINGS"]['DB'] == '':
         return redirect("/settings", code=302)
     
-    return render_template('meters.html', meters=db.getMeters())
+    return render_template('meters.html', meter=db.getMeters().first())
 
 
 @app.route("/meter_settings", methods=('GET', 'POST'))

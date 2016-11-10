@@ -1,6 +1,6 @@
 {% extends "index.html" %} 
 {% block meters %}
-<div id="meter-tabs">
+<div id="meter-tabs" meter_id="{{ meter.id }}">
   <ul>
     <li><a href="#meter-tabs-images">Images</a></li>
     <li><a href="#meter-tabs-values">Values</a></li>
@@ -11,10 +11,6 @@
     <li><a href="#meter-tabs-energy-prices">Energy Prices</a></li>
   </ul>
   <div id="meter-tabs-images">
-  
-  
-  
-  
   </div>
   <div id="meter-tabs-values">
   </div>
@@ -29,4 +25,6 @@
   <div id="meter-tabs-energy-prices">
   </div>
 </div>
+
 {% endblock %}
+

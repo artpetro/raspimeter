@@ -1,0 +1,54 @@
+<div class="all-products page">
+	<div class="filters">
+		<form>
+			<div class="filter-criteria">
+				<span>Filter</span> <label><input type="checkbox"
+					name="flag" value="0">Successful recognized</label> <label><input
+					type="checkbox" name="flag" value="7">Preprocessing error</label> <label><input
+					type="checkbox" name="flag" value="2">Not trained</label> <label><input
+					type="checkbox" name="flag" value="3">Invalid value</label> <label><input
+					type="checkbox" name="flag" value="4">Digit(s) not
+					recognized</label> <label><input type="checkbox" name="flag"
+					value="5">Not enough digits</label> <label><input
+					type="checkbox" name="flag" value="6">Deleted</label> 
+			</div>
+			<!-- button class="clear-filters-button">Clear filters</button-->
+			<button class="recognize-all-button" id="{{ pagination.page }}">Recognize all</button>
+		</form>
+	</div>
+	
+	<div class=pagination>
+        {% for page in pagination.iter_pages() %}
+            {% if page %}
+                {% if page != pagination.page %}
+                    <a href="{{ url_for(endpoint, meter_id=meter_id, flag=flag, page=page) }}">{{ page }}</a>
+                {% else %}
+                    <strong>{{ page }}</strong>
+                {% endif %}
+            {% else %}
+                <span class=ellipsis>...</span>
+            {% endif %}
+        {% endfor %}
+    </div>
+
+	<ul class="products-list" id={{ meter_id }}>
+		{% for item in pagination.items %}
+		<li id="{{ item.timestamp.strftime('%Y-%m-%d-%H:%M:%S') }}" data-index="{{ item.id }}" flag={{ item.flag }}>
+			<a href="#" class="product-photo"><img class="lazy"
+				data-original="static/images/{{ '%s_%s_%s_preview.png' % (item.timestamp.strftime('%Y-%m-%d_%H-%M-%S'), item.meter.id, item.id) }}" width="200"
+				height="130" /></a>
+			<h2>
+				<a href="#"> {{ item.timestamp }} </a>
+			</h2>
+			<ul class="product-description">
+				<li><span>Meter value: </span>{{ item.numeric_value }}</li>
+				<li><span>Status: </span>{{ flags[item.flag] }}</li>
+				<!-- li><span>Previous value: </span>TODO</li>
+				<li><span>Next value: </span>TODO</li-->
+			</ul>
+			<button>Edit</button>
+			<div class="highlight"></div>
+		</li> {% endfor %}
+	</ul>
+</div>
+
