@@ -1,5 +1,6 @@
 $(function() {
-
+ 
+	// Meter Tabs
 	// Meter Tabs
 	$("#meter-tabs").tabs();
 	loadSettingsTab($("#meter-tabs-meter-settings"), "/meter_settings");
