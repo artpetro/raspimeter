@@ -3,6 +3,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import json
 import cPickle
+from subprocess import call
 
 from flask import request, send_from_directory, render_template, redirect
 from flask_mongoengine.wtf import model_form
@@ -382,6 +383,15 @@ def recognizeAll():
     success_recogn_counter = Raspimeter.readAndRecognizeAllImages(db, meter_id, page, store_recognized_images)
     
     return json.dumps({'recognized': success_recogn_counter})
+
+
+@app.route("/restart_server", methods=['GET'])
+def restartServer():
+    '''
+    '''
+    call(["sudo", "supervisorctl", "restart", "raspimeter_server"])
+    
+    return json.dumps({'restart': "OK"})
     
 
 @app.route('/js/<path:path>')
