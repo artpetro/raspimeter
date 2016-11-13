@@ -395,7 +395,7 @@ def restartServer():
 
 
 @app.route("/restart_runner", methods=['GET'])
-def restartServer():
+def restartRunner():
     '''
     '''
     call(["sudo", "supervisorctl", "restart", "raspimeter_runner"])
