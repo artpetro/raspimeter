@@ -391,7 +391,16 @@ def restartServer():
     '''
     call(["sudo", "supervisorctl", "restart", "raspimeter_server"])
     
-    return json.dumps({'restart': "OK"})
+    return json.dumps({'restart_server': "OK"})
+
+
+@app.route("/restart_runner", methods=['GET'])
+def restartServer():
+    '''
+    '''
+    call(["sudo", "supervisorctl", "restart", "raspimeter_runner"])
+    
+    return json.dumps({'restart_runner': "OK"})
     
 
 @app.route('/js/<path:path>')
