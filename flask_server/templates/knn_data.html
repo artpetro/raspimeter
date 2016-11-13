@@ -11,8 +11,8 @@
       <tr>
         <td>{{ key }}</td>
         <td>
-        {% for image_data in value %}
-        	<div id="knn-data-container-{{ key }}" class="knn-data-container">
+        <div id="knn-data-container-{{ key }}" class="knn-data-container">
+        	{% for image_data in value %}
 	    			<script type="text/javascript">
 						// w*h = 20*45
 						var array = JSON.parse("{{ image_data['image'] }}");
@@ -27,10 +27,8 @@
 						var img = '<div class="knn-data-container"><img src="data:image/png;base64,'+p.getBase64()+'"><div><input type="checkbox" class="checkbox" id="{{ image_data['id'] }}" /></div> </div>';
 						$('#knn-data-container-{{ key }}').append(img);
 					</script>
-				
-			</div>
-		{% endfor %}
-			
+			{% endfor %}
+		</div>
 		</td>
        </tr>
     {% endfor %}
