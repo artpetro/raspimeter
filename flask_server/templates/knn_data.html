@@ -1,0 +1,42 @@
+<div class="all-values page">
+	<table id="values" cellspacing="0" cellpadding="0">
+    <thead>
+      <tr>
+        <th><span>Number</span></th>
+        <th><span>Image</span></th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for key, value in items.iteritems() %}
+      <tr>
+        <td>{{ key }}</td>
+        <td>
+        {% for image_data in value %}
+        	<div id="knn-data-container-{{ key }}" class="knn-data-container">
+	    			<script type="text/javascript">
+						// w*h = 20*45
+						var array = JSON.parse("{{ image_data['image'] }}");
+						var p = new PNGlib(20, 45, 256);
+						var background = p.color(0, 0, 0, 0);
+						for (var i = 0; i < 20; i++) {
+							for (var j = 0; j < 45; j++) {
+							var c = array[j][i];
+								p.buffer[p.index(i, j)] = p.color(c,c,c);
+							}
+						}
+						var img = '<div class="knn-data-container"><img src="data:image/png;base64,'+p.getBase64()+'"><div><input type="checkbox" class="checkbox" id="{{ image_data['id'] }}" /></div> </div>';
+						$('#knn-data-container-{{ key }}').append(img);
+					</script>
+				
+			</div>
+		{% endfor %}
+			
+		</td>
+       </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+	
+</div>
+
+

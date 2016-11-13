@@ -110,7 +110,9 @@ class SingleDigitKNNRecogniser(object):
             if response != -1:
                 samples.append(self.__reshapeImage(digits[i]))
                 trained_responses.append(response)
-                digits_images.append(digits[i])
+                digits_images.append(digits[i])# should be digits[i].getPreparedImage(), but it works:) 
+                # (complete Digit object will stored in the database)
+                # s. comment of mongo_models.KNNTrainData
                 new_records_count += 1
 #             print 'response: %d' % response
 #             print '%d digits left' % (len(digits) - i)

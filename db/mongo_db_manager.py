@@ -173,8 +173,6 @@ class MongoDataBaseManager():
         
         meter = Meter.objects(id=meter_id).first()
         meter_values = MeterValue.objects(meter=meter) if flag == ALL_VALUES else MeterValue.objects(flag=flag, meter=meter)
-#         recognized_dir = settings.get("Output", "recognized_images_dir")
-#         not_recognized_dir = settings.get("Output", "not_recognized_images_dir")
              
         for meter_value in meter_values:
             timestamp = meter_value.timestamp
@@ -201,7 +199,16 @@ class MongoDataBaseManager():
             meter_values = MeterValue.objects(meter=meter) if flag == ALL_VALUES else MeterValue.objects(flag=flag, meter=meter)
 
         return meter_values.paginate(page=page, per_page=per_page)
-                  
+    
+    
+    @staticmethod
+    def getKNNData(meter_id=1):
+        '''
+        '''
+        meter = Meter.objects(id=meter_id).first()
+
+        return KNNTrainData.objects(meter=meter)
+                          
     
     @staticmethod   
     def storeMeterValue(meter_id, 

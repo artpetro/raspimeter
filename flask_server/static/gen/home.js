@@ -427,476 +427,741 @@ hasBidiBug:Nb,isTouchDevice:Jb,numberFormat:Ga,seriesTypes:F,setOptions:function
 
 /*! Lazy Load 1.9.7 - MIT license - Copyright 2010-2015 Mika Tuupola */
 !function(a,b,c,d){var e=a(b);a.fn.lazyload=function(f){function g(){var b=0;i.each(function(){var c=a(this);if(!j.skip_invisible||c.is(":visible"))if(a.abovethetop(this,j)||a.leftofbegin(this,j));else if(a.belowthefold(this,j)||a.rightoffold(this,j)){if(++b>j.failure_limit)return!1}else c.trigger("appear"),b=0})}var h,i=this,j={threshold:0,failure_limit:0,event:"scroll",effect:"show",container:b,data_attribute:"original",skip_invisible:!1,appear:null,load:null,placeholder:"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsQAAA7EAZUrDhsAAAANSURBVBhXYzh8+PB/AAffA0nNPuCLAAAAAElFTkSuQmCC"};return f&&(d!==f.failurelimit&&(f.failure_limit=f.failurelimit,delete f.failurelimit),d!==f.effectspeed&&(f.effect_speed=f.effectspeed,delete f.effectspeed),a.extend(j,f)),h=j.container===d||j.container===b?e:a(j.container),0===j.event.indexOf("scroll")&&h.bind(j.event,function(){return g()}),this.each(function(){var b=this,c=a(b);b.loaded=!1,(c.attr("src")===d||c.attr("src")===!1)&&c.is("img")&&c.attr("src",j.placeholder),c.one("appear",function(){if(!this.loaded){if(j.appear){var d=i.length;j.appear.call(b,d,j)}a("<img />").bind("load",function(){var d=c.attr("data-"+j.data_attribute);c.hide(),c.is("img")?c.attr("src",d):c.css("background-image","url('"+d+"')"),c[j.effect](j.effect_speed),b.loaded=!0;var e=a.grep(i,function(a){return!a.loaded});if(i=a(e),j.load){var f=i.length;j.load.call(b,f,j)}}).attr("src",c.attr("data-"+j.data_attribute))}}),0!==j.event.indexOf("scroll")&&c.bind(j.event,function(){b.loaded||c.trigger("appear")})}),e.bind("resize",function(){g()}),/(?:iphone|ipod|ipad).*os 5/gi.test(navigator.appVersion)&&e.bind("pageshow",function(b){b.originalEvent&&b.originalEvent.persisted&&i.each(function(){a(this).trigger("appear")})}),a(c).ready(function(){g()}),this},a.belowthefold=function(c,f){var g;return g=f.container===d||f.container===b?(b.innerHeight?b.innerHeight:e.height())+e.scrollTop():a(f.container).offset().top+a(f.container).height(),g<=a(c).offset().top-f.threshold},a.rightoffold=function(c,f){var g;return g=f.container===d||f.container===b?e.width()+e.scrollLeft():a(f.container).offset().left+a(f.container).width(),g<=a(c).offset().left-f.threshold},a.abovethetop=function(c,f){var g;return g=f.container===d||f.container===b?e.scrollTop():a(f.container).offset().top,g>=a(c).offset().top+f.threshold+a(c).height()},a.leftofbegin=function(c,f){var g;return g=f.container===d||f.container===b?e.scrollLeft():a(f.container).offset().left,g>=a(c).offset().left+f.threshold+a(c).width()},a.inviewport=function(b,c){return!(a.rightoffold(b,c)||a.leftofbegin(b,c)||a.belowthefold(b,c)||a.abovethetop(b,c))},a.extend(a.expr[":"],{"below-the-fold":function(b){return a.belowthefold(b,{threshold:0})},"above-the-top":function(b){return!a.belowthefold(b,{threshold:0})},"right-of-screen":function(b){return a.rightoffold(b,{threshold:0})},"left-of-screen":function(b){return!a.rightoffold(b,{threshold:0})},"in-viewport":function(b){return a.inviewport(b,{threshold:0})},"above-the-fold":function(b){return!a.belowthefold(b,{threshold:0})},"right-of-fold":function(b){return a.rightoffold(b,{threshold:0})},"left-of-fold":function(b){return!a.rightoffold(b,{threshold:0})}})}(jQuery,window,document);
-$(function () {
-		
+/**
+* A handy class to calculate color values.
+*
+* @version 1.0
+* @author Robert Eisele <robert@xarg.org>
+* @copyright Copyright (c) 2010, Robert Eisele
+* @link http://www.xarg.org/2010/03/generate-client-side-png-files-using-javascript/
+* @license http://www.opensource.org/licenses/bsd-license.php BSD License
+*
+*/
+
+(function() {
+
+	// helper functions for that ctx
+	function write(buffer, offs) {
+		for (var i = 2; i < arguments.length; i++) {
+			for (var j = 0; j < arguments[i].length; j++) {
+				buffer[offs++] = arguments[i].charAt(j);
+			}
+		}
+	}
+
+	function byte2(w) {
+		return String.fromCharCode((w >> 8) & 255, w & 255);
+	}
+
+	function byte4(w) {
+		return String.fromCharCode((w >> 24) & 255, (w >> 16) & 255, (w >> 8) & 255, w & 255);
+	}
+
+	function byte2lsb(w) {
+		return String.fromCharCode(w & 255, (w >> 8) & 255);
+	}
+
+	window.PNGlib = function(width,height,depth) {
+
+		this.width   = width;
+		this.height  = height;
+		this.depth   = depth;
+
+		// pixel data and row filter identifier size
+		this.pix_size = height * (width + 1);
+
+		// deflate header, pix_size, block headers, adler32 checksum
+		this.data_size = 2 + this.pix_size + 5 * Math.floor((0xfffe + this.pix_size) / 0xffff) + 4;
+
+		// offsets and sizes of Png chunks
+		this.ihdr_offs = 0;									// IHDR offset and size
+		this.ihdr_size = 4 + 4 + 13 + 4;
+		this.plte_offs = this.ihdr_offs + this.ihdr_size;	// PLTE offset and size
+		this.plte_size = 4 + 4 + 3 * depth + 4;
+		this.trns_offs = this.plte_offs + this.plte_size;	// tRNS offset and size
+		this.trns_size = 4 + 4 + depth + 4;
+		this.idat_offs = this.trns_offs + this.trns_size;	// IDAT offset and size
+		this.idat_size = 4 + 4 + this.data_size + 4;
+		this.iend_offs = this.idat_offs + this.idat_size;	// IEND offset and size
+		this.iend_size = 4 + 4 + 4;
+		this.buffer_size  = this.iend_offs + this.iend_size;	// total PNG size
+
+		this.buffer  = new Array();
+		this.palette = new Object();
+		this.pindex  = 0;
+
+		var _crc32 = new Array();
+
+		// initialize buffer with zero bytes
+		for (var i = 0; i < this.buffer_size; i++) {
+			this.buffer[i] = "\x00";
+		}
+
+		// initialize non-zero elements
+		write(this.buffer, this.ihdr_offs, byte4(this.ihdr_size - 12), 'IHDR', byte4(width), byte4(height), "\x08\x03");
+		write(this.buffer, this.plte_offs, byte4(this.plte_size - 12), 'PLTE');
+		write(this.buffer, this.trns_offs, byte4(this.trns_size - 12), 'tRNS');
+		write(this.buffer, this.idat_offs, byte4(this.idat_size - 12), 'IDAT');
+		write(this.buffer, this.iend_offs, byte4(this.iend_size - 12), 'IEND');
+
+		// initialize deflate header
+		var header = ((8 + (7 << 4)) << 8) | (3 << 6);
+		header+= 31 - (header % 31);
+
+		write(this.buffer, this.idat_offs + 8, byte2(header));
+
+		// initialize deflate block headers
+		for (var i = 0; (i << 16) - 1 < this.pix_size; i++) {
+			var size, bits;
+			if (i + 0xffff < this.pix_size) {
+				size = 0xffff;
+				bits = "\x00";
+			} else {
+				size = this.pix_size - (i << 16) - i;
+				bits = "\x01";
+			}
+			write(this.buffer, this.idat_offs + 8 + 2 + (i << 16) + (i << 2), bits, byte2lsb(size), byte2lsb(~size));
+		}
+
+		/* Create crc32 lookup table */
+		for (var i = 0; i < 256; i++) {
+			var c = i;
+			for (var j = 0; j < 8; j++) {
+				if (c & 1) {
+					c = -306674912 ^ ((c >> 1) & 0x7fffffff);
+				} else {
+					c = (c >> 1) & 0x7fffffff;
+				}
+			}
+			_crc32[i] = c;
+		}
+
+		// compute the index into a png for a given pixel
+		this.index = function(x,y) {
+			var i = y * (this.width + 1) + x + 1;
+			var j = this.idat_offs + 8 + 2 + 5 * Math.floor((i / 0xffff) + 1) + i;
+			return j;
+		}
+
+		// convert a color and build up the palette
+		this.color = function(red, green, blue, alpha) {
+
+			alpha = alpha >= 0 ? alpha : 255;
+			var color = (((((alpha << 8) | red) << 8) | green) << 8) | blue;
+
+			if (typeof this.palette[color] == "undefined") {
+				if (this.pindex == this.depth) return "\x00";
+
+				var ndx = this.plte_offs + 8 + 3 * this.pindex;
+
+				this.buffer[ndx + 0] = String.fromCharCode(red);
+				this.buffer[ndx + 1] = String.fromCharCode(green);
+				this.buffer[ndx + 2] = String.fromCharCode(blue);
+				this.buffer[this.trns_offs+8+this.pindex] = String.fromCharCode(alpha);
+
+				this.palette[color] = String.fromCharCode(this.pindex++);
+			}
+			return this.palette[color];
+		}
+
+		// output a PNG string, Base64 encoded
+		this.getBase64 = function() {
+
+			var s = this.getDump();
+
+			// If the current browser supports the Base64 encoding
+			// function, then offload the that to the browser as it
+			// will be done in native code.
+			if ((typeof window.btoa !== 'undefined') && (window.btoa !== null)) {
+				return window.btoa(s);
+			}
+
+			var ch = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+			var c1, c2, c3, e1, e2, e3, e4;
+			var l = s.length;
+			var i = 0;
+			var r = "";
+
+			do {
+				c1 = s.charCodeAt(i);
+				e1 = c1 >> 2;
+				c2 = s.charCodeAt(i+1);
+				e2 = ((c1 & 3) << 4) | (c2 >> 4);
+				c3 = s.charCodeAt(i+2);
+				if (l < i+2) { e3 = 64; } else { e3 = ((c2 & 0xf) << 2) | (c3 >> 6); }
+				if (l < i+3) { e4 = 64; } else { e4 = c3 & 0x3f; }
+				r+= ch.charAt(e1) + ch.charAt(e2) + ch.charAt(e3) + ch.charAt(e4);
+			} while ((i+= 3) < l);
+			return r;
+		}
+
+		// output a PNG string
+		this.getDump = function() {
+
+			// compute adler32 of output pixels + row filter bytes
+			var BASE = 65521; /* largest prime smaller than 65536 */
+			var NMAX = 5552;  /* NMAX is the largest n such that 255n(n+1)/2 + (n+1)(BASE-1) <= 2^32-1 */
+			var s1 = 1;
+			var s2 = 0;
+			var n = NMAX;
+
+			for (var y = 0; y < this.height; y++) {
+				for (var x = -1; x < this.width; x++) {
+					s1+= this.buffer[this.index(x, y)].charCodeAt(0);
+					s2+= s1;
+					if ((n-= 1) == 0) {
+						s1%= BASE;
+						s2%= BASE;
+						n = NMAX;
+					}
+				}
+			}
+			s1%= BASE;
+			s2%= BASE;
+			write(this.buffer, this.idat_offs + this.idat_size - 8, byte4((s2 << 16) | s1));
+
+			// compute crc32 of the PNG chunks
+			function crc32(png, offs, size) {
+				var crc = -1;
+				for (var i = 4; i < size-4; i += 1) {
+					crc = _crc32[(crc ^ png[offs+i].charCodeAt(0)) & 0xff] ^ ((crc >> 8) & 0x00ffffff);
+				}
+				write(png, offs+size-4, byte4(crc ^ -1));
+			}
+
+			crc32(this.buffer, this.ihdr_offs, this.ihdr_size);
+			crc32(this.buffer, this.plte_offs, this.plte_size);
+			crc32(this.buffer, this.trns_offs, this.trns_size);
+			crc32(this.buffer, this.idat_offs, this.idat_size);
+			crc32(this.buffer, this.iend_offs, this.iend_size);
+
+			// convert PNG to string
+			return "\211PNG\r\n\032\n"+this.buffer.join('');
+		}
+	}
+
+})();
+
+$(function() {
+
+	var handlerSetted = false;
+
 	// Meter Tabs
-	$( "#meter-tabs" ).tabs();
-	loadSettingsTab($( "#meter-tabs-meter-settings" ), "/meter_settings");
-	loadSettingsTab($( "#meter-tabs-meter-image-settings" ), "/meter_image_settings");
-	loadSettingsTab($( "#meter-tabs-knn-settings" ), "/knn_settings");
-	
-	var meterId = $( "#meter-tabs" ).attr("meter_id");
-	
-	loadImagesTab($( "#meter-tabs-images" ), '/images',  meterId, 1, -1);
-	loadImagesTab($( "#meter-tabs-values" ), '/values',  meterId, 1, -1);
-	
+	$("#meter-tabs").tabs();
+	loadSettingsTab($("#meter-tabs-meter-settings"), "/meter_settings");
+	loadSettingsTab($("#meter-tabs-meter-image-settings"),
+			"/meter_image_settings");
+	loadSettingsTab($("#meter-tabs-knn-settings"), "/knn_settings");
+
+	var meterId = $("#meter-tabs").attr("meter_id");
+
+	loadImagesTab($("#meter-tabs-images"), '/images', meterId, 1, -1);
+	loadValuesTab($("#meter-tabs-values"), '/values', meterId, 1, -1);
+	$("#meter-tabs-knn-data").load('/knn_data' + "?meter_id=" + meterId);
+
 	function loadImagesTab(tab, url, meterId, page, flag) {
-		
-		tab.load(url + "?meter_id=" + meterId + "&flag=" + flag + "&page=" + page, function() {
+
+		tab.load(url + "?meter_id=" + meterId + "&flag=" + flag + "&page="
+				+ page, function() {
+			
+			$("img.lazy").lazyload({
+				event : 'scroll load-images'
+			});
+			
+			filtering();
 			images();
-			$('.pagination > a').each(function() {
-				//console.log($(this));
+
+			if (!handlerSetted) {
+				handlerSetted = true;
+				addSingleImageButtonsHandler();
+			}
+
+			tab.find('.pagination > a').each(function() {
 				$(this).attr("href", "#");
 			})
-			$('.pagination > a').click(function(event) {
-			    event.preventDefault();
-			    var page = $(event.target).text();
-			    loadImagesTab(tab, url, meterId, page, flag);
+			
+			tab.find('.pagination > a').click(function(event) {
+				event.preventDefault();
+				var page = $(event.target).text();
+				loadImagesTab(tab, url, meterId, page, flag);
 			});
-		});	
+		});
 	}
-	
-	
-	
-	
+
+	function loadValuesTab(tab, url, meterId, page, flag) {
+		tab.load(url + "?meter_id=" + meterId + "&flag=" + flag + "&page="
+				+ page, function() {
+			
+			tab.find('.pagination > a').each(function() {
+				$(this).attr("href", "#");
+			})
+			
+			tab.find('.pagination > a').click(function(event) {
+				event.preventDefault();
+				var page = $(event.target).text();
+				loadValuesTab(tab, url, meterId, page, flag);
+			});
+		});
+	}
+
+
 	// Settings Tabs
-	$( "#settings-tabs" ).tabs();
-	loadSettingsTab($( "#settings-tabs-1" ), "/db_settings");
-	loadSettingsTab($( "#settings-tabs-2" ), "/ci_settings");
-	
-	
+	$("#settings-tabs").tabs();
+	loadSettingsTab($("#settings-tabs-1"), "/db_settings");
+	loadSettingsTab($("#settings-tabs-2"), "/ci_settings");
+
 	function loadSettingsTab(tab, url) {
-		tab.load( url , function() {
+		tab.load(url, function() {
 			saveSettingsButtonHandler(tab);
 		});
 	}
-	
+
 	function saveSettingsButtonHandler(tab) {
 		var form = tab.find("form");
 		var url = form.attr("action");
 		var btn = form.find(".save-button");
-		btn.click(function (e) {
-			
+		btn.click(function(e) {
+
 			e.preventDefault();
 			$.ajax({
-			      type: 'POST',
-			      url: url,
-			      data: form.serialize(),
-			      success: function(response) {
-			    	  tab.html(response);
-			    	  saveSettingsButtonHandler(tab);
-			      },
-			      error: function() {
-			    	  alert("ERROR");
-			      }
-			    });
+				type : 'POST',
+				url : url,
+				data : form.serialize(),
+				success : function(response) {
+					tab.html(response);
+					saveSettingsButtonHandler(tab);
+				},
+				error : function() {
+					alert("ERROR");
+				}
+			});
 		});
 	}
+
 	
-	
-	function images() {
-		
-		$("img.lazy").lazyload({event: 'scroll load-images'});
-		
+	function filtering() {
+
 		var filters = {};
-		
-		
 		var checkboxes = $('.all-products input[type=checkbox]');
 
-		checkboxes.click(function () {
+		checkboxes.click(function() {
 
-			var that = $(this),
-				specName = that.attr('name');
+			var that = $(this), specName = that.attr('name');
 
-			// When a checkbox is checked we need to write that in the filters object;
-			if(that.is(":checked")) {
+			// When a checkbox is checked we need to write that in the filters
+			// object;
+			if (that.is(":checked")) {
 
-				// If the filter for this specification isn't created yet - do it.
-				if(!(filters[specName] && filters[specName].length)){
+				// If the filter for this specification isn't created yet - do
+				// it.
+				if (!(filters[specName] && filters[specName].length)) {
 					filters[specName] = [];
 				}
 
-				//	Push values into the chosen filter array
+				// Push values into the chosen filter array
 				filters[specName].push(that.val());
 
 			}
 
-			// When a checkbox is unchecked we need to remove its value from the filters object.
-			if(!that.is(":checked")) {
+			// When a checkbox is unchecked we need to remove its value from the
+			// filters object.
+			if (!that.is(":checked")) {
 
-				if(filters[specName] && filters[specName].length && (filters[specName].indexOf(that.val()) != -1)){
+				if (filters[specName] && filters[specName].length
+						&& (filters[specName].indexOf(that.val()) != -1)) {
 
-					// Find the checkbox value in the corresponding array inside the filters object.
+					// Find the checkbox value in the corresponding array inside
+					// the filters object.
 					var index = filters[specName].indexOf(that.val());
 
 					// Remove it.
 					filters[specName].splice(index, 1);
 
-					// If it was the last remaining value for this specification,
+					// If it was the last remaining value for this
+					// specification,
 					// delete the whole array.
-					if(!filters[specName].length){
+					if (!filters[specName].length) {
 						delete filters[specName];
 					}
 
 				}
 			}
-			
+
 			// Change the url hash;
 			createQueryHash(filters);
-			
+
 		});
 
-		// When the "Clear all filters" button is pressed change the hash to '#' (go to the home page)
-		$('.clear-filters-button').click(function (e) {
+		// When the "Clear all filters" button is pressed change the hash to '#'
+		// (go to the home page)
+		$('.clear-filters-button').click(function(e) {
 			e.preventDefault();
 			window.location.hash = '#';
 		});
-		
-		// Try to recognize all 
-		$('.recognize-all-button').click(function (e) {
-			
-			e.preventDefault();
-			
-			var meterId = $('.products-list').attr('id');
-			var page = $(this).attr('id');
-			
-			console.log(page);
-			
-			$.getJSON( "recognize_all?meter_id=" + meterId + "&page=" + page, function(data) {
-				
-				// TODO loader.gif
-				console.log(data);
-				window.location.hash = '#';
-				
-			});
-		});
-		
-		$(window).on('hashchange', function(){
+
+		// Try to recognize all
+		$('.recognize-all-button').click(
+				function(e) {
+
+					e.preventDefault();
+
+					var meterId = $('.products-list').attr('id');
+					var page = $(this).attr('id');
+
+					console.log(page);
+
+					$.getJSON("recognize_all?meter_id=" + meterId + "&page="
+							+ page, function(data) {
+
+						// TODO loader.gif
+						console.log(data);
+						window.location.hash = '#';
+
+					});
+				});
+
+		$(window).on('hashchange', function() {
 			render(decodeURI(window.location.hash));
 		});
-		
+	}
+
+	function addSingleImageButtonsHandler() {
 		$('#delete_button').click(function() {
 			deleteMeterImageAndMeterValue();
-			// don't reload page
 			return false;
 		});
-		
+
 		$('#save_button').click(function() {
 			trainKNNAndStoreIntoDB();
-			// don't reload page
 			return false;
 		});
-		
-		$('.all-products .products-list').find('li').on('click', function (e) {
-			
+	}
+
+	function images() {
+
+		$('.all-products .products-list').find('li').on('click', function(e) {
+
 			e.preventDefault();
 
 			var imageId = $(this).data('index');
 
-			//window.location.hash = '#' + imageId;
-			
+			// window.location.hash = '#' + imageId;
+
 			// fetch single image data
-			$.getJSON( "get_image?id=" + imageId, function(image) {
-				
+			$.getJSON("get_image?id=" + imageId, function(image) {
+
 				renderSingleMeterValue(image);
-				
+
 			});
 		})
-				
-		
-		function renderSingleMeterValue(image){
-			
-			var page = $('.single-product');
-			var container = $('.preview-large');
-			
-			$.getJSON( "get_digits?image_name=" + image.name, function(digits) {
-				
-				$.getJSON( "get_meter?id=" + image.name.split("_")[2], function(meter) {
-			
-					renderMeterDigits(meter, digits, image.flag);
-			
-				});	
+
+	}
+
+	function renderSingleMeterValue(image) {
+
+		var page = $('.single-product');
+		var container = $('.preview-large');
+
+		$.getJSON("get_digits?image_name=" + image.name, function(digits) {
+
+			$.getJSON("get_meter?id=" + image.name.split("_")[2], function(
+					meter) {
+
+				renderMeterDigits(meter, digits, image.flag);
+
 			});
-			
-			console.log(moment.utc(image.time, "YYYY-MM-DD H:mm:ss").format('lll'));
-			
-			container.find('h3').text(image.time);
-			container.find('img').attr('src', 'static/images/' + image.name);
-			container.find('img').attr('image-name', image.name);
-			
-			$('#save_button').addClass('disabled-button');
-			$('#delete_button').addClass('disabled-button');
-			$('#use_for_knn').prop('disabled', true);
-			$('#use_for_knn').prop('checked', false);
-			$(".preview-large .loader").fadeOut("slow");
-			// Show the page.
-			page.addClass('visible');
+		});
 
-		}
-		
+		console.log(moment.utc(image.time, "YYYY-MM-DD H:mm:ss").format('lll'));
 
-		function renderMeterDigits(meter, digits, flag) {
-			
-			var deleteButton = $('#delete_button');
-			
-			deleteButton.removeClass('disabled-button');
-			
-			var list = $('.single-product .preview-large .meter-value-rectangle .digits-list');
-			
-			list.empty();
-			
-			digits.forEach(function(digit, index) {
-				
-				var listItem = '<li><div id="' + index + '" class="digit-cell">' + 
-				'<input id="' + index + '" class="digit-input" type="number" maxlength="1" size="1" value="' + digit + '">' 
-				+ '</div></li>';
-				
-				list.append(listItem);
-				
-			});
-			
-			// not recognized digits and decimal places
-			var digitsNumber = parseInt(meter.meter_settings.digits_number);
-			var decimalPlaces = parseInt(meter.meter_settings.decimal_places);
-			
-			$.each(digits, function(index, value) {
+		container.find('h3').text(image.time);
+		container.find('img').attr('src', 'static/images/' + image.name);
+		container.find('img').attr('image-name', image.name);
 
-				if (value == -1) {
-					$('#' + index + '.digit-input').addClass('not-recognized-digit');
-					$('#' + index + '.digit-input').val(0);
-				}
+		$('#save_button').addClass('disabled-button');
+		$('#delete_button').addClass('disabled-button');
+		$('#use_for_knn').prop('disabled', true);
+		$('#use_for_knn').prop('checked', false);
+		$(".preview-large .loader").fadeOut("slow");
+		// Show the page.
+		page.addClass('visible');
 
-				if (index >= (digitsNumber - decimalPlaces)) {
-					$('div.digit-cell#' + index).addClass('decimal');
-				}
-			});
-			
-			
-			if (flag != 0) {
-				enableSaveButton();
+	}
+
+	
+	function renderMeterDigits(meter, digits, flag) {
+
+		var deleteButton = $('#delete_button');
+
+		deleteButton.removeClass('disabled-button');
+
+		var list = $('.single-product .preview-large .meter-value-rectangle .digits-list');
+
+		list.empty();
+
+		digits.forEach(function(digit, index) {
+
+					var listItem = '<li><div id="digit-cell-'
+							+ index
+							+ '" class="digit-cell">'
+							+ '<input id="'
+							+ index
+							+ '" class="digit-input" type="number" maxlength="1" size="1" value="'
+							+ digit + '">' + '</div></li>';
+
+					console.log("create");
+					console.log(listItem);
+
+					list.append(listItem);
+
+				});
+
+		// not recognized digits and decimal places
+		var digitsNumber = parseInt(meter.meter_settings.digits_number);
+		var decimalPlaces = parseInt(meter.meter_settings.decimal_places);
+
+		$.each(digits, function(index, value) {
+
+			if (value == -1) {
+				$('#' + index + '.digit-input').addClass('not-recognized-digit');
+				$('#' + index + '.digit-input').val(0);
 			}
 			
-			var old_value = 0;
-
-			$('.digit-input').focus(function(){
-				
-				old_value = $(this).val();            
-				$(this).select();
-				
-			});
+			console.log("index ");
+			console.log(index);
+			console.log("digitsNumber - decimalPlaces ");
+			console.log(digitsNumber - decimalPlaces);
 			
 			
-			$('.digit-input').blur(function(){
-				
-				if (old_value != $(this).val()) {
-					
-					// enable Save button and checkbox
-					enableSaveButton();
-					
-					$(this).addClass("changed");
-					$(this).removeClass('not-recognized-digit');
-				
-				}
-			});
-		}
-		
-		function enableSaveButton() {
-			$('#save_button').removeClass('disabled-button');
-			$('#use_for_knn').prop('disabled', false);
-			$('#use_for_knn').prop('checked', true);
-		}
-		
-		function trainKNNAndStoreIntoDB(){
-			
-			var container = $('.preview-large');
-			var imageName = container.find('img').attr('image-name');
-
-			var list = $('.single-product .preview-large .meter-value-rectangle .digits-list .digit-input');
-
-			var responses = []
-			
-			list.each(function(index) {
-				
-				if ($(this).hasClass("changed")) {
-
-					responses.push(parseInt($(this).val()));
-				
-				} else {
-					
-					responses.push(-1);
-				
-				}
-			});
-			
-			console.log(responses);
-			
-			var train = $('#use_for_knn').prop('checked');
-			
-			$.getJSON( "/save_digits?image_name=" + imageName + "&train=" + train + "&responses=" +  JSON.stringify(responses), function(resp) {
-				
-				console.log(resp);
-				$('#save_button').addClass('disabled-button');
-//	    		updatePreview();
-
-			});		
-		}
-		
-		
-		function deleteMeterImageAndMeterValue() {
-			
-			// TODO confirm dialog
-			var container = $('.preview-large');
-			var time = container.find('h3').text();
-			var imageName = container.find('img').attr('image-name');
-			
-			var perm_delete = $('#permanently_delete').prop('checked');
-
-			$.getJSON( "/delete_meter_value?image_name=" + imageName + "&perm=" + perm_delete, function(resp) {
-				
-				console.log(resp);
-				$("li[id*='" + time + "']").remove();
-	    		closePreview();
-
-			});	
-		}
-		
-
-		var singleProductPage = $('.single-product');
-
-		singleProductPage.on('click', function (e) {
-
-			if (singleProductPage.hasClass('visible')) {
-
-				var clicked = $(e.target);
-
-				// If the close button or the background are clicked go to the previous page.
-				if (clicked.hasClass('close') || clicked.hasClass('overlay')) {
-					closePreview();
-				}
+			if (index >= (digitsNumber - decimalPlaces)) {
+				console.log("red");
+				console.log($('#digit-cell-' + index).html());
+				$('#digit-cell-' + index).addClass('decimal');
 			}
 		});
-		
-		
-		function closePreview() {
-//			createQueryHash(filters);
-			var page = $('.single-product');
-			// TODO clear content
-			page.removeClass('visible');
+
+		// WOZU???
+		if (flag != 0) {
+			enableSaveButton();
 		}
-		
-	   
-		// Navigation
-		function render(url) {
 
-			// Get the keyword from the url.
-			var temp = url.split('/')[0];
+		var old_value = 0;
 
-			// Hide whatever page is currently shown.
-			$('.main-content .page').removeClass('visible');
+		$('.digit-input').focus(function() {
 
+			old_value = $(this).val();
+			$(this).select();
 
-			var	map = {
+		});
 
-				'': function() {
-					
-					filters = {};
-					checkboxes.prop('checked',false);
-					filterImages(filters);
+		$('.digit-input').blur(function() {
 
-				},
+			if (old_value != $(this).val()) {
 
-				'#': function() {
+				// enable Save button and checkbox
+				enableSaveButton();
 
-					filters = {};
-					checkboxes.prop('checked', false);
-					filterImages(filters);
-					
-				},
+				$(this).addClass("changed");
+				$(this).removeClass('not-recognized-digit');
 
-				// Page with filtered products
-				'#filter': function() {
-
-					url = url.split('#filter/')[1].trim();
-
-					try {
-						filters = JSON.parse(url);
-					}
-					catch(err) {
-						window.location.hash = '#';
-						return;
-					}
-					
-					filterImages(filters);
-					
-				}
-			};
-
-			if(map[temp]){
-				map[temp]();
 			}
-		}
-
-		
-		function filterImages(filters) {
-			
-//			console.log("filter images: ");
-//			console.log(filters);
-			
-			if (typeof filters['flag'] === "undefined") {
-				
-				$('.all-products .products-list > li').show();
-				
-			} else {
-			
-				$('.all-products .products-list > li').hide();
-				
-				$.each(filters['flag'], function(index, value) {
-					
-//					console.log($("li[flag='" + value + "']"));
-					
-					$("li[flag='" + value + "']").show();
-					
-					$(window).resize();//
-					$("img.lazy").trigger("load-images");
-					
-//					When you initialize lazyload you can tell it which event(s) to trigger on (by default it is set to 'scroll'). I suggest adding a custom event to that list and triggering it whenever it makes sense for you:
-	//
-//						$('.lazy').lazyload({
-//						    event: 'scroll whenever-i-want'
-//						});
-	//
-//						// whenever you want to trigger your event (after ajax load, on dom ready, etc...)
-//						$(document).trigger('whenever-i-want');
-//						This leaves the default scroll functionality in but also allows you to trigger the lazy loading on demand.
-		
-				});
-			}
-		}
-
-
-		// Shows the error page.
-		function renderErrorPage(){
-			var page = $('.error');
-			page.addClass('visible');
-		}
-
-		// Get the filters object, turn it into a string and write it into the hash.
-		function createQueryHash(filters){
-
-			// Here we check if filters isn't empty.
-			if(!$.isEmptyObject(filters)){
-				// Stringify the object via JSON.stringify and write it after the '#filter' keyword.
-				window.location.hash = '#filter/' + JSON.stringify(filters);
-			}
-			else{
-				// If it's empty change the hash to '#' (the homepage).
-				window.location.hash = '#';
-			}
-		}
-		
+		});
 	}
-	
-	
+
+	function enableSaveButton() {
+		$('#save_button').removeClass('disabled-button');
+		$('#use_for_knn').prop('disabled', false);
+		$('#use_for_knn').prop('checked', true);
+	}
+
+	function trainKNNAndStoreIntoDB() {
+
+		var container = $('.preview-large');
+		var imageName = container.find('img').attr('image-name');
+
+		var list = $('.single-product .preview-large .meter-value-rectangle .digits-list .digit-input');
+
+		var responses = []
+
+		list.each(function(index) {
+
+			if ($(this).hasClass("changed")) {
+
+				responses.push(parseInt($(this).val()));
+
+			} else {
+
+				responses.push(-1);
+
+			}
+		});
+
+		console.log(responses);
+
+		var train = $('#use_for_knn').prop('checked');
+
+		$.getJSON("/save_digits?image_name=" + imageName + "&train=" + train
+				+ "&responses=" + JSON.stringify(responses), function(resp) {
+
+			console.log(resp);
+			$('#save_button').addClass('disabled-button');
+			// updatePreview();
+
+		});
+	}
+
+	function deleteMeterImageAndMeterValue() {
+
+		// TODO confirm dialog
+		var container = $('.preview-large');
+		var time = container.find('h3').text();
+		var imageName = container.find('img').attr('image-name');
+
+		var perm_delete = $('#permanently_delete').prop('checked');
+
+		$.getJSON("/delete_meter_value?image_name=" + imageName + "&perm="
+				+ perm_delete, function(resp) {
+
+			console.log(resp);
+			$("li[id*='" + time + "']").remove();
+			closePreview();
+
+		});
+	}
+
+	var singleProductPage = $('.single-product');
+
+	singleProductPage.on('click', function(e) {
+
+		if (singleProductPage.hasClass('visible')) {
+
+			var clicked = $(e.target);
+
+			// If the close button or the background are clicked go to the
+			// previous page.
+			if (clicked.hasClass('close') || clicked.hasClass('overlay')) {
+				closePreview();
+			}
+		}
+	});
+
+	function closePreview() {
+		// createQueryHash(filters);
+		var page = $('.single-product');
+		// TODO clear content
+		page.removeClass('visible');
+	}
+
+	// Navigation
+	function render(url) {
+
+		// Get the keyword from the url.
+		var temp = url.split('/')[0];
+
+		// Hide whatever page is currently shown.
+		$('.main-content .page').removeClass('visible');
+
+		var map = {
+
+			'' : function() {
+
+				filters = {};
+				checkboxes.prop('checked', false);
+				filterImages(filters);
+
+			},
+
+			'#' : function() {
+
+				filters = {};
+				checkboxes.prop('checked', false);
+				filterImages(filters);
+
+			},
+
+			// Page with filtered products
+			'#filter' : function() {
+
+				url = url.split('#filter/')[1].trim();
+
+				try {
+					filters = JSON.parse(url);
+				} catch (err) {
+					window.location.hash = '#';
+					return;
+				}
+
+				filterImages(filters);
+
+			}
+		};
+
+		if (map[temp]) {
+			map[temp]();
+		}
+	}
+
+	function filterImages(filters) {
+
+		// console.log("filter images: ");
+		// console.log(filters);
+
+		if (typeof filters['flag'] === "undefined") {
+
+			$('.all-products .products-list > li').show();
+
+		} else {
+
+			$('.all-products .products-list > li').hide();
+
+			$.each(filters['flag'], function(index, value) {
+
+				// console.log($("li[flag='" + value + "']"));
+
+				$("li[flag='" + value + "']").show();
+
+				$(window).resize();//
+				$("img.lazy").trigger("load-images");
+
+				// When you initialize lazyload you can tell it which event(s)
+				// to trigger on (by default it is set to 'scroll'). I suggest
+				// adding a custom event to that list and triggering it whenever
+				// it makes sense for you:
+				//
+				// $('.lazy').lazyload({
+				// event: 'scroll whenever-i-want'
+				// });
+				//
+				// // whenever you want to trigger your event (after ajax load,
+				// on dom ready, etc...)
+				// $(document).trigger('whenever-i-want');
+				// This leaves the default scroll functionality in but also
+				// allows you to trigger the lazy loading on demand.
+
+			});
+		}
+	}
+
+	// Shows the error page.
+	function renderErrorPage() {
+		var page = $('.error');
+		page.addClass('visible');
+	}
+
+	// Get the filters object, turn it into a string and write it into the hash.
+	function createQueryHash(filters) {
+
+		// Here we check if filters isn't empty.
+		if (!$.isEmptyObject(filters)) {
+			// Stringify the object via JSON.stringify and write it after the
+			// '#filter' keyword.
+			window.location.hash = '#filter/' + JSON.stringify(filters);
+		} else {
+			// If it's empty change the hash to '#' (the homepage).
+			window.location.hash = '#';
+		}
+	}
+
 });
 $(function () {
     // Initial variables for chart-container

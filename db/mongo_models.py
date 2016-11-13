@@ -81,6 +81,7 @@ class CameraInput(mongo_db_engine.Document):
     
 class KNNTrainData(mongo_db_engine.Document):
     '''
+    src_image - an object of image_preprocessing.Digit
     '''
     meter = mongo_db_engine.ReferenceField(Meter, required=True)
     sample = mongo_db_engine.BinaryField(required=True)

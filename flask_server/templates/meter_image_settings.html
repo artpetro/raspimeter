@@ -21,13 +21,3 @@
 		</div>
 	</form>
 </div>
-
-<script>
-if ($("#last_knn_capture").is(':visible')) {
-	setInterval(function(){
-		var img = $("#last_knn_capture");
-		var src = img.attr("src").split('?')[0];
-	    img.attr("src", src + "?"+new Date().getTime());
-	},10000);
-}
-</script>

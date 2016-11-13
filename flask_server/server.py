@@ -2,6 +2,7 @@ import os, sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import json
+import cPickle
 
 from flask import request, send_from_directory, render_template, redirect
 from flask_mongoengine.wtf import model_form
@@ -81,6 +82,25 @@ def renderValuesWithPagination():
     flags = ["OK", "RNV", "NT", "IV", "DNR", "NED", "D", "PE"]
     
     return render_template('values.html', meter_id=meter_id, pagination=pagination, flag=flag, flags=flags, endpoint='renderValuesWithPagination')
+
+
+@app.route("/knn_data", methods=['GET'])
+def renderKNNData():
+    '''
+    '''
+    meter_id = request.args.get('meter_id')
+    knn_data = db.getKNNData(meter_id=meter_id)
+    items = dict.fromkeys(range(0, 10))
+    
+    for i in range(0, 10):
+        items[i] = []
+    
+    for item in knn_data:
+        img = cPickle.loads(item.src_image).getPreparedImage()
+        items[item.response].append({'image' : json.dumps(img.tolist()), 
+                                     'id': item.id})
+        
+    return render_template('knn_data.html', meter_id=meter_id, items=items)
 
 
 @app.route("/meters", methods=('GET', 'POST'))
