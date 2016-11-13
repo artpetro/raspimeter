@@ -644,8 +644,6 @@ hasBidiBug:Nb,isTouchDevice:Jb,numberFormat:Ga,seriesTypes:F,setOptions:function
 
 $(function() {
 
-	var handlerSetted = false;
-
 	// Meter Tabs
 	$("#meter-tabs").tabs();
 	loadSettingsTab($("#meter-tabs-meter-settings"), "/meter_settings");
@@ -671,10 +669,8 @@ $(function() {
 			filtering();
 			images();
 
-			if (!handlerSetted) {
-				handlerSetted = true;
-				addSingleImageButtonsHandler();
-			}
+			addSingleImageButtonsHandler();
+			addPreviewCloseHandler();
 
 			tab.find('.pagination > a').each(function() {
 				$(this).attr("href", "#");
@@ -824,6 +820,23 @@ $(function() {
 			render(decodeURI(window.location.hash));
 		});
 	}
+	
+	function addPreviewCloseHandler() {
+		
+		var singleProductPage = $('.single-product');
+		
+		singleProductPage.on('click', function(e) {
+
+			if (singleProductPage.hasClass('visible')) {
+
+				var clicked = $(e.target);
+
+				if (clicked.hasClass('close') || clicked.hasClass('overlay')) {
+					closePreview();
+				}
+			}
+		});
+	}
 
 	function addSingleImageButtonsHandler() {
 		$('#delete_button').click(function() {
@@ -909,9 +922,6 @@ $(function() {
 							+ '" class="digit-input" type="number" maxlength="1" size="1" value="'
 							+ digit + '">' + '</div></li>';
 
-					console.log("create");
-					console.log(listItem);
-
 					list.append(listItem);
 
 				});
@@ -927,15 +937,7 @@ $(function() {
 				$('#' + index + '.digit-input').val(0);
 			}
 			
-			console.log("index ");
-			console.log(index);
-			console.log("digitsNumber - decimalPlaces ");
-			console.log(digitsNumber - decimalPlaces);
-			
-			
 			if (index >= (digitsNumber - decimalPlaces)) {
-				console.log("red");
-				console.log($('#digit-cell-' + index).html());
 				$('#digit-cell-' + index).addClass('decimal');
 			}
 		});
@@ -1028,22 +1030,6 @@ $(function() {
 
 		});
 	}
-
-	var singleProductPage = $('.single-product');
-
-	singleProductPage.on('click', function(e) {
-
-		if (singleProductPage.hasClass('visible')) {
-
-			var clicked = $(e.target);
-
-			// If the close button or the background are clicked go to the
-			// previous page.
-			if (clicked.hasClass('close') || clicked.hasClass('overlay')) {
-				closePreview();
-			}
-		}
-	});
 
 	function closePreview() {
 		// createQueryHash(filters);

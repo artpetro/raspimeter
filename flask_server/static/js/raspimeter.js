@@ -1,7 +1,5 @@
 $(function() {
 
-	var handlerSetted = false;
-
 	// Meter Tabs
 	$("#meter-tabs").tabs();
 	loadSettingsTab($("#meter-tabs-meter-settings"), "/meter_settings");
@@ -27,10 +25,8 @@ $(function() {
 			filtering();
 			images();
 
-			if (!handlerSetted) {
-				handlerSetted = true;
-				addSingleImageButtonsHandler();
-			}
+			addSingleImageButtonsHandler();
+			addPreviewCloseHandler();
 
 			tab.find('.pagination > a').each(function() {
 				$(this).attr("href", "#");
@@ -178,6 +174,23 @@ $(function() {
 
 		$(window).on('hashchange', function() {
 			render(decodeURI(window.location.hash));
+		});
+	}
+	
+	function addPreviewCloseHandler() {
+		
+		var singleProductPage = $('.single-product');
+		
+		singleProductPage.on('click', function(e) {
+
+			if (singleProductPage.hasClass('visible')) {
+
+				var clicked = $(e.target);
+
+				if (clicked.hasClass('close') || clicked.hasClass('overlay')) {
+					closePreview();
+				}
+			}
 		});
 	}
 
@@ -373,22 +386,6 @@ $(function() {
 
 		});
 	}
-
-	var singleProductPage = $('.single-product');
-
-	singleProductPage.on('click', function(e) {
-
-		if (singleProductPage.hasClass('visible')) {
-
-			var clicked = $(e.target);
-
-			// If the close button or the background are clicked go to the
-			// previous page.
-			if (clicked.hasClass('close') || clicked.hasClass('overlay')) {
-				closePreview();
-			}
-		}
-	});
 
 	function closePreview() {
 		// createQueryHash(filters);
