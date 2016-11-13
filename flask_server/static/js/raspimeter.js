@@ -1,7 +1,6 @@
 $(function() {
  
 	// Meter Tabs
-	// Meter Tabs
 	$("#meter-tabs").tabs();
 	loadSettingsTab($("#meter-tabs-meter-settings"), "/meter_settings");
 	loadSettingsTab($("#meter-tabs-meter-image-settings"),
@@ -62,6 +61,10 @@ $(function() {
 	$("#settings-tabs").tabs();
 	loadSettingsTab($("#settings-tabs-1"), "/db_settings");
 	loadSettingsTab($("#settings-tabs-2"), "/ci_settings");
+	$("#settings-tabs-controls").load('/controls', function() {
+		addRestartButtonHandler($("#restart-server-button"), '/restart_server');
+		addRestartButtonHandler($("#restart-runner-button"), '/restart_runner');
+	});
 
 	function loadSettingsTab(tab, url) {
 		tab.load(url, function() {
@@ -83,6 +86,23 @@ $(function() {
 				success : function(response) {
 					tab.html(response);
 					saveSettingsButtonHandler(tab);
+				},
+				error : function() {
+					alert("ERROR");
+				}
+			});
+		});
+	}
+	
+	
+	function addRestartButtonHandler(btn, url) {
+		btn.click(function(e) {
+			e.preventDefault();
+			$.ajax({
+				type : 'GET',
+				url : url,
+				success : function(response) {
+					alert(response);
 				},
 				error : function() {
 					alert("ERROR");

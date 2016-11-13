@@ -4,6 +4,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 import json
 import cPickle
 from subprocess import call
+import traceback
 
 from flask import request, send_from_directory, render_template, redirect
 from flask_mongoengine.wtf import model_form
@@ -203,9 +204,6 @@ def renderatDatabaseSettings():
     name = request.form.get('name')
     password = request.form.get('password') 
     
-    print name
-    print password
-    
     if name is None:
         name = app.config["MONGODB_SETTINGS"]['DB']
         password = app.config["SECRET_KEY"]
@@ -367,11 +365,15 @@ def getDigits():
     '''
     '''
     image_name = request.args.get('image_name')
-    
     store_recognized_images = True
     
     return json.dumps(Raspimeter.readAndRecognizeImage(db, image_name, store_recognized_images)[3])
 
+#     try:
+#         return json.dumps(Raspimeter.readAndRecognizeImage(db, image_name, store_recognized_images)[3])
+# 
+#     except Exception as e:
+#         return "ERROR"
 
 @app.route("/recognize_all", methods=['GET'])
 def recognizeAll():
@@ -389,21 +391,44 @@ def recognizeAll():
 def restartServer():
     '''
     '''
-    call(["sudo", "supervisorctl", "restart", "raspimeter_server"])
+    message = "OK"
     
-    return json.dumps({'restart_server': "OK"})
+    try:
+        call(["sudo", "supervisorctl", "restart", "raspimeter_server"])
+    
+    except Exception as e:
+        message = "ERROR"
+        traceback.print_exc()
+        
+    return json.dumps({'restart_server': message})
+
+
+@app.route("/controls", methods=['GET'])
+def renderControls():
+    '''
+    '''
+    status_server = "TODO in server"
+    status_runner = "TODO in server"
+        
+    return render_template('controls.html', status_server=status_server, status_runner=status_runner)
 
 
 @app.route("/restart_runner", methods=['GET'])
 def restartRunner():
     '''
     '''
-    call(["sudo", "supervisorctl", "restart", "raspimeter_runner"])
+    message = "OK"
     
-    return json.dumps({'restart_runner': "OK"})
+    try:
+        call(["sudo", "supervisorctl", "restart", "raspimeter_runner"])
+    
+    except Exception as e:
+        message = "ERROR"
+        traceback.print_exc()
+    
+    return json.dumps({'restart_runner': message})
     
 
 @app.route('/js/<path:path>')
 def send_js(path):
-    print path
     return send_from_directory(os.path.join('js', path).replace('\\','/'))
