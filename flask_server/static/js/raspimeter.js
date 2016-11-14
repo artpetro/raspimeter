@@ -248,10 +248,7 @@ $(function() {
 		container.find('h3').text(image.time);
 		
 		var img = container.find('img');
-		img.attr('data-original', 'static/images/' + image.name);//.attr('src', 'static/images/' + image.name);
-		img.lazyload({
-			effect : "fadeIn"
-		});
+		img.attr('src', 'static/images/' + image.name);
 		img.attr('image-name', image.name);
 
 		$('#save_button').addClass('disabled-button');
@@ -399,7 +396,7 @@ $(function() {
 		page.removeClass('visible');
 		var container = $('.preview-large');
 		container.find('h3').text("");
-		container.find('img').attr('data-original', '');
+		container.find('img').attr('src', '');
 		container.find('img').attr('image-name', '');
 		var list = $('.single-product .preview-large .meter-value-rectangle .digits-list');
 		list.empty();
