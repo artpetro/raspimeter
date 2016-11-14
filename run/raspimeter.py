@@ -158,6 +158,7 @@ class Raspimeter(threading.Thread):
         '''
         # get last recognized value
         last_value = db.getLastValideMeterValue(meter_id, timestamp)
+        # TODO get next valide value
         
         if last_value <= numeric_value:
             return VALIDE_VALUE
@@ -210,13 +211,19 @@ class Raspimeter(threading.Thread):
             for meter_value in values:
                 print "recognize %s" % counter
                 counter += 1
-                timestamp = meter_value.timestamp
-                image_name = "%s_%s_%s.png" % (timestamp.strftime('%Y-%m-%d_%H-%M-%S'), meter_value.meter.id, meter_value.id)
-                flag = Raspimeter.readAndRecognizeImage(db, image_name, store_recognized_images)[1]
-            
-                if flag == VALIDE_VALUE:
-                    print "success"
-                    success_recogn_count += 1
+                
+                try:
+                    timestamp = meter_value.timestamp
+                    image_name = "%s_%s_%s.png" % (timestamp.strftime('%Y-%m-%d_%H-%M-%S'), meter_value.meter.id, meter_value.id)
+                    flag = Raspimeter.readAndRecognizeImage(db, image_name, store_recognized_images)[1]
+                
+                    if flag == VALIDE_VALUE:
+                        print "success"
+                        success_recogn_count += 1
+                
+                except Exception as e:
+                    traceback.print_exc()
+                    
         
         print "recognized %s" % success_recogn_count
         
