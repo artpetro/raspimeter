@@ -198,7 +198,7 @@ class Raspimeter(threading.Thread):
     def recognizeBulk(db, meter_id):
         '''
         '''
-        flags = (NOT_TRAINED, DIGITS_NOT_RECOGNIZED, NOT_ENOUGH_DIGITS, PREPROCESSING_ERROR, NOT_VALIDE_VALUE)
+        flags = (DIGITS_NOT_RECOGNIZED, NOT_TRAINED, NOT_ENOUGH_DIGITS, PREPROCESSING_ERROR, NOT_VALIDE_VALUE)
         store_recognized_images = True
         success_recogn_count = 0
         
