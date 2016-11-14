@@ -208,6 +208,15 @@ class MongoDataBaseManager():
         meter = Meter.objects(id=meter_id).first()
 
         return KNNTrainData.objects(meter=meter)
+    
+    
+    @staticmethod
+    def deleteKNNData(meter_id, id):
+        '''
+        '''
+        meter = Meter.objects(id=meter_id).first()
+        knn_data = KNNTrainData.objects(meter=meter, id=id)
+        knn_data.delete()
                           
     
     @staticmethod   

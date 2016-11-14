@@ -24,7 +24,13 @@
 								p.buffer[p.index(i, j)] = p.color(c,c,c);
 							}
 						}
-						var img = '<div class="knn-data-container"><img src="data:image/png;base64,'+p.getBase64()+'"><div><input type="checkbox" class="checkbox" id="{{ image_data['id'] }}" /></div> </div>';
+						
+						var img = '<div class="knn-data-container">' + 
+						'<img src="data:image/png;base64,'
+						+ p.getBase64() + 
+						'"><div><input type="checkbox" class="knn-data-checkbox"' + 
+						' id="{{ image_data['id'] }}" /></div> </div>';
+						
 						$('#knn-data-container-{{ key }}').append(img);
 					</script>
 			{% endfor %}
@@ -34,7 +40,11 @@
     {% endfor %}
     </tbody>
   </table>
-	
+
+	<div class="settings-buttons-container">
+		<button id="delete-knn-data" class="delete-button" meter-id={{ meter_id }}>Delete Selected</button>
+	</div>
+
 </div>
 
 

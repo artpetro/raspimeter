@@ -11,7 +11,7 @@ $(function() {
 
 	loadImagesTab($("#meter-tabs-images"), '/images', meterId, 1, -1);
 	loadValuesTab($("#meter-tabs-values"), '/values', meterId, 1, -1);
-	$("#meter-tabs-knn-data").load('/knn_data' + "?meter_id=" + meterId);
+	loadKNNData($("#meter-tabs-knn-data"), '/knn_data', meterId);
 
 	function loadImagesTab(tab, url, meterId, page, flag) {
 
@@ -40,6 +40,7 @@ $(function() {
 		});
 	}
 
+	
 	function loadValuesTab(tab, url, meterId, page, flag) {
 		tab.load(url + "?meter_id=" + meterId + "&flag=" + flag + "&page="
 				+ page, function() {
@@ -52,6 +53,33 @@ $(function() {
 				event.preventDefault();
 				var page = $(event.target).text();
 				loadValuesTab(tab, url, meterId, page, flag);
+			});
+		});
+	}
+	
+	
+	function loadKNNData(tab, url, meterId) {
+		tab.load(url + "?meter_id=" + meterId, function() {
+			
+			 $(this).find("#delete-knn-data").click(function() {
+				
+				var checkBoxes = tab.find(".knn-data-checkbox:checked");
+				var ids = [];
+				
+				checkBoxes.each(function() {
+					ids.push($(this).attr("id"));
+				});
+				
+				$.get("/delete_knn_data", {
+						meter_id : meterId,
+						ids : JSON.stringify(ids)
+					}, function(data) {
+						console.log(data);
+						loadKNNData(tab, url, meterId);
+				}).fail(function() {
+				    alert( "ERROR" );
+				});
+				
 			});
 		});
 	}

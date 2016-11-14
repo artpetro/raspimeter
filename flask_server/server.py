@@ -238,8 +238,6 @@ def getMeters():
     return json.dumps(meters)    
 
 
-
-
 @app.route("/get_consumption", methods=['GET'])
 def getConsumption():
     '''
@@ -321,6 +319,21 @@ def deleteMeterValue():
     deleted_from_db = db.deleteMeterValue(value_id, perm)
 
     return json.dumps({'deleted_from_db': deleted_from_db})
+
+
+@app.route("/delete_knn_data", methods=['GET'])
+def deleteKNNData():
+    '''
+    '''
+    meter_id = request.args.get('meter_id')
+    ids = json.loads(str(request.args.get('ids')))
+    message = "OK"
+    
+    for id in ids:
+        db.deleteKNNData(meter_id, id)
+
+    return json.dumps({'deleted': message})
+
 
 
 @app.route("/delete_image", methods=['GET'])
@@ -407,8 +420,9 @@ def restartServer():
 def renderControls():
     '''
     '''
-    status_server = "TODO in server"
+    status_server = "TODO_in_server"
     status_runner = "TODO in server"
+    #output = subprocess.check_output(["ping", "-c","2", "-W","2", "1.1.1.1"])
         
     return render_template('controls.html', status_server=status_server, status_runner=status_runner)
 
