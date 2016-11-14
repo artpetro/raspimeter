@@ -22,7 +22,9 @@ $(function() {
 				event : 'scroll load-images'
 			});
 			
-			filtering();
+			tab.find(':input[value="' + flag + '"]').prop('checked',true);
+			
+			filterHandler(tab, url, meterId, page);
 			images();
 
 			addSingleImageButtonsHandler();
@@ -138,93 +140,44 @@ $(function() {
 			});
 		});
 	}
+	
+	
+	function filterHandler(tab, url, meterId, page) {
+
+		var radiobuttons = tab.find('input[type=radio]');
+
+		radiobuttons.click(function() {
+			
+			var flag = $(this).val();
+
+			loadImagesTab(tab, url, meterId, page, flag);
+
+		});
+
+	}
 
 	
-	function filtering() {
+	// Try to recognize all on page
+	$('.recognize-all-button').click(
+			function(e) {
 
-		var filters = {};
-		var checkboxes = $('.all-products input[type=checkbox]');
+				e.preventDefault();
 
-		checkboxes.click(function() {
+				var meterId = $('.products-list').attr('id');
+				var page = $(this).attr('id');
 
-			var that = $(this), specName = that.attr('name');
+				console.log(page);
 
-			// When a checkbox is checked we need to write that in the filters
-			// object;
-			if (that.is(":checked")) {
+				$.getJSON(
+						"recognize_all?meter_id=" + meterId + "&page=" + page,
+						function(data) {
 
-				// If the filter for this specification isn't created yet - do
-				// it.
-				if (!(filters[specName] && filters[specName].length)) {
-					filters[specName] = [];
-				}
+							// TODO loader.gif
+							console.log(data);
+							window.location.hash = '#';
 
-				// Push values into the chosen filter array
-				filters[specName].push(that.val());
-
-			}
-
-			// When a checkbox is unchecked we need to remove its value from the
-			// filters object.
-			if (!that.is(":checked")) {
-
-				if (filters[specName] && filters[specName].length
-						&& (filters[specName].indexOf(that.val()) != -1)) {
-
-					// Find the checkbox value in the corresponding array inside
-					// the filters object.
-					var index = filters[specName].indexOf(that.val());
-
-					// Remove it.
-					filters[specName].splice(index, 1);
-
-					// If it was the last remaining value for this
-					// specification,
-					// delete the whole array.
-					if (!filters[specName].length) {
-						delete filters[specName];
-					}
-
-				}
-			}
-
-			// Change the url hash;
-			createQueryHash(filters);
-
+						});
 		});
-
-		// When the "Clear all filters" button is pressed change the hash to '#'
-		// (go to the home page)
-		$('.clear-filters-button').click(function(e) {
-			e.preventDefault();
-			window.location.hash = '#';
-		});
-
-		// Try to recognize all
-		$('.recognize-all-button').click(
-				function(e) {
-
-					e.preventDefault();
-
-					var meterId = $('.products-list').attr('id');
-					var page = $(this).attr('id');
-
-					console.log(page);
-
-					$.getJSON("recognize_all?meter_id=" + meterId + "&page="
-							+ page, function(data) {
-
-						// TODO loader.gif
-						console.log(data);
-						window.location.hash = '#';
-
-					});
-				});
-
-		$(window).on('hashchange', function() {
-			render(decodeURI(window.location.hash));
-		});
-	}
 	
 	function addPreviewCloseHandler() {
 		
