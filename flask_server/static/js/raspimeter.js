@@ -246,8 +246,13 @@ $(function() {
 		console.log(moment.utc(image.time, "YYYY-MM-DD H:mm:ss").format('lll'));
 
 		container.find('h3').text(image.time);
-		container.find('img').attr('src', 'static/images/' + image.name);
-		container.find('img').attr('image-name', image.name);
+		
+		var img = container.find('img');
+		img.attr('data-original', 'static/images/' + image.name);//.attr('src', 'static/images/' + image.name);
+		img.lazyload({
+			effect : "fadeIn"
+		});
+		img.attr('image-name', image.name);
 
 		$('#save_button').addClass('disabled-button');
 		$('#delete_button').addClass('disabled-button');
@@ -390,101 +395,16 @@ $(function() {
 	}
 
 	function closePreview() {
-		// createQueryHash(filters);
 		var page = $('.single-product');
-		// TODO clear content
 		page.removeClass('visible');
+		var container = $('.preview-large');
+		container.find('h3').text("");
+		container.find('img').attr('data-original', '');
+		container.find('img').attr('image-name', '');
+		var list = $('.single-product .preview-large .meter-value-rectangle .digits-list');
+		list.empty();
 	}
 
-	// Navigation
-	function render(url) {
-
-		// Get the keyword from the url.
-		var temp = url.split('/')[0];
-
-		// Hide whatever page is currently shown.
-		$('.main-content .page').removeClass('visible');
-
-		var map = {
-
-			'' : function() {
-
-				filters = {};
-				checkboxes.prop('checked', false);
-				filterImages(filters);
-
-			},
-
-			'#' : function() {
-
-				filters = {};
-				checkboxes.prop('checked', false);
-				filterImages(filters);
-
-			},
-
-			// Page with filtered products
-			'#filter' : function() {
-
-				url = url.split('#filter/')[1].trim();
-
-				try {
-					filters = JSON.parse(url);
-				} catch (err) {
-					window.location.hash = '#';
-					return;
-				}
-
-				filterImages(filters);
-
-			}
-		};
-
-		if (map[temp]) {
-			map[temp]();
-		}
-	}
-
-	function filterImages(filters) {
-
-		// console.log("filter images: ");
-		// console.log(filters);
-
-		if (typeof filters['flag'] === "undefined") {
-
-			$('.all-products .products-list > li').show();
-
-		} else {
-
-			$('.all-products .products-list > li').hide();
-
-			$.each(filters['flag'], function(index, value) {
-
-				// console.log($("li[flag='" + value + "']"));
-
-				$("li[flag='" + value + "']").show();
-
-				$(window).resize();//
-				$("img.lazy").trigger("load-images");
-
-				// When you initialize lazyload you can tell it which event(s)
-				// to trigger on (by default it is set to 'scroll'). I suggest
-				// adding a custom event to that list and triggering it whenever
-				// it makes sense for you:
-				//
-				// $('.lazy').lazyload({
-				// event: 'scroll whenever-i-want'
-				// });
-				//
-				// // whenever you want to trigger your event (after ajax load,
-				// on dom ready, etc...)
-				// $(document).trigger('whenever-i-want');
-				// This leaves the default scroll functionality in but also
-				// allows you to trigger the lazy loading on demand.
-
-			});
-		}
-	}
 
 	// Shows the error page.
 	function renderErrorPage() {
