@@ -389,15 +389,26 @@ def getDigits():
 #         return "ERROR"
 
 @app.route("/recognize_all", methods=['GET'])
-def recognizeAll():
+def recognizeAllOnPage():
     '''
+    TODO long time request
     '''
     meter_id = request.args.get('meter_id')
     page = int(request.args.get('page'))
     store_recognized_images = True
-    success_recogn_counter = Raspimeter.readAndRecognizeAllImages(db, meter_id, page, store_recognized_images)
+    success_recogn_counter = Raspimeter.recognizeAllImagesOnPage(db, meter_id, page, store_recognized_images)
     
     return json.dumps({'recognized': success_recogn_counter})
+
+
+@app.route("/recognize_bulk", methods=['GET'])
+def recognizeBulk():
+    '''
+    TODO long time request
+    '''
+    meter_id = request.args.get('meter_id')
+    
+    return json.dumps({'recognized': "OK"})
 
 
 @app.route("/restart_server", methods=['GET'])

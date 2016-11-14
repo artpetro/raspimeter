@@ -178,7 +178,7 @@ class MongoDataBaseManager():
             timestamp = meter_value.timestamp
             image_name = "%s_%s_%s.png" % (timestamp.strftime('%Y-%m-%d_%H-%M-%S'), meter_value.meter.id, meter_value.id)
             
-            images_list.append({'name': image_name, 
+            images_list.append({'name': image_name,
                 'time': timestamp.strftime('%Y-%m-%d-%H:%M:%S'), 
                 'value':  meter_value.numeric_value, 
                 'flag': meter_value.flag, 
@@ -186,6 +186,19 @@ class MongoDataBaseManager():
              
         return images_list
     
+    
+    @staticmethod
+    def getValuesWithImages(meter_id=1, flag=ALL_VALUES):
+        '''
+        '''
+        meter = Meter.objects(id=meter_id).first()
+        
+        if flag == ALL_VALUES:
+            return MeterValue.objects(has_image=True, meter=meter)  
+        else: 
+            return MeterValue.objects(has_image=True, flag=flag, meter=meter)
+             
+
     @staticmethod
     def getImagesWithPagination(meter_id=1, image_requiered=True, flag=ALL_VALUES, page=1, per_page=10):
         '''

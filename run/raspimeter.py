@@ -168,7 +168,7 @@ class Raspimeter(threading.Thread):
         
         
     @staticmethod
-    def readAndRecognizeAllImages(db, meter_id, page, store_recognized_images):
+    def recognizeAllImagesOnPage(db, meter_id, page, store_recognized_images):
         '''
         '''
         flags = (NOT_TRAINED, DIGITS_NOT_RECOGNIZED, NOT_ENOUGH_DIGITS, PREPROCESSING_ERROR, NOT_VALIDE_VALUE)
@@ -191,6 +191,37 @@ class Raspimeter(threading.Thread):
         
         #print success_recogn_count
                 
+        return success_recogn_count
+    
+    
+    @staticmethod
+    def recognizeBulk(db, meter_id):
+        '''
+        '''
+        flags = (NOT_TRAINED, DIGITS_NOT_RECOGNIZED, NOT_ENOUGH_DIGITS, PREPROCESSING_ERROR, NOT_VALIDE_VALUE)
+        values = db.getValuesWithImages(meter_id, flag=ALL_VALUES)
+        store_recognized_images = True
+        
+        success_recogn_count = 0
+        counter = 0
+        
+        for meter_value in values:
+            print "recognize %s of %s" % (counter, len(values))
+            counter += 1
+            timestamp = meter_value.timestamp
+            image_name = "%s_%s_%s.png" % (timestamp.strftime('%Y-%m-%d_%H-%M-%S'), meter_value.meter.id, meter_value.id)
+            
+            if meter_value.flag in flags:
+#                 path = ROOT_DIR + image_name
+#                 image = cv2.imread(path, cv2.IMREAD_COLOR)
+#                 cv2.imshow("", image)
+#                 cv2.waitKey(0)
+                flag = Raspimeter.readAndRecognizeImage(db, image_name, store_recognized_images)[1]
+            
+                if flag == VALIDE_VALUE:
+                    print "success"
+                    success_recogn_count += 1
+        
         return success_recogn_count
         
         
@@ -249,3 +280,11 @@ class Raspimeter(threading.Thread):
             
         except:
             print "file not found %s" % image_name
+            
+            
+if __name__ == '__main__':
+    from db.mongo_db_manager import MongoDataBaseManager as mdb
+    meters = mdb.getMeters()
+    for meter in meters:
+        Raspimeter.recognizeBulk(mdb, meter.id)
+        
