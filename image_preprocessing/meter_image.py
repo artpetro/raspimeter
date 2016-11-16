@@ -118,7 +118,6 @@ class MeterImage(object):
         
         height, width = prepared_image.shape[:2]
         prepared_image = cv2.resize(prepared_image, (self.__image_width, int(self.__image_width * height / width)))
-        # remove noise
         prepared_image = cv2.GaussianBlur(prepared_image, (3, 3), 0)
         
         return prepared_image
@@ -178,11 +177,7 @@ class MeterImage(object):
         based on https://www.kompf.de/cplus/emeocv.html, https://github.com/skaringa/emeocv/blob/master/ImageProcessor.cpp
         '''
         edges = self.__getCannyEdges()
-        # only two ret vals in opencv 2.* :
         contours, hierarchy = cv2.findContours(edges, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
-        # v 3.*:
-        #_, contours, hierarchy = cv2.findContours(edges, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
-        # filter contours by bounding rect size
         filtered_contours, boundingBoxes = self.__filterContours(contours)
         alignedBoundingBoxes = list()
         
@@ -191,7 +186,6 @@ class MeterImage(object):
             
             if len(tmp_alignedBoundingBoxes) > len(alignedBoundingBoxes):
                 alignedBoundingBoxes = tmp_alignedBoundingBoxes
-        
         
         alignedBoundingBoxes = sorted(set(alignedBoundingBoxes))
         
@@ -377,7 +371,7 @@ class MeterImage(object):
         '''
         TODO adopt canny params
         '''
-        if self.__edges is None:
+        if 1:#self.__edges is None:
             ret, _ = cv2.threshold(self.__grayscaled_source_image.copy(), 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
             canny_1 = ret * 0.5
             canny_2 = ret
