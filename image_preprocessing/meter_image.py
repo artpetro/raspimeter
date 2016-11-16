@@ -381,8 +381,8 @@ class MeterImage(object):
             ret, _ = cv2.threshold(self.__grayscaled_source_image, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
             canny_1 = ret * 0.5
             canny_2 = ret
-            print canny_1
-            print canny_2
+            #print canny_1
+            #print canny_2
     #         canny_1 = self.__meter_image_settings.canny_1
     #         canny_2 = self.__meter_image_settings.canny_2
             self.__edges = cv2.Canny(self.__grayscaled_source_image, canny_1, canny_2)

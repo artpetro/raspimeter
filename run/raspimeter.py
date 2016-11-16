@@ -219,11 +219,12 @@ class Raspimeter(threading.Thread):
                 if flag == VALIDE_VALUE:
                     print "success"
                     success_recogn_count += 1
+                    
+                else:
+                    print "flag %s" % flag
                 
             except Exception as e:
                 traceback.print_exc()
-            
-                    
         
         print "recognized %s" % success_recogn_count
         
