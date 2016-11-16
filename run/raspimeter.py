@@ -77,7 +77,7 @@ class Raspimeter(threading.Thread):
             except Exception as e:
                 traceback.print_exc()
                 
-            time.sleep(1)
+            time.sleep(sleeptime)
             
     
     def takeAndStoreImage(self):
