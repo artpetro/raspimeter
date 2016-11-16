@@ -71,8 +71,7 @@ class Raspimeter(threading.Thread):
                     self.takeAndStoreImage()
                 else:
                     print 'recognize'
-                    value = self.takeAndRecognizeImage()
-                    print value
+                    self.takeAndRecognizeImage()
             
             except Exception as e:
                 traceback.print_exc()
@@ -114,8 +113,6 @@ class Raspimeter(threading.Thread):
         self.__db.updateLastMeterCaptures(meter)
         self.__db.updateWeather(meter, timestamp)
         
-        return ''.join(map(str, digits_values))
-    
     @staticmethod
     def recognizeMeterValue(db, meter, image):
         '''

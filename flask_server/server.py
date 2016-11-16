@@ -382,11 +382,6 @@ def getDigits():
     
     return json.dumps(Raspimeter.readAndRecognizeImage(db, image_name, store_recognized_images)[3])
 
-#     try:
-#         return json.dumps(Raspimeter.readAndRecognizeImage(db, image_name, store_recognized_images)[3])
-# 
-#     except Exception as e:
-#         return "ERROR"
 
 @app.route("/recognize_all", methods=['GET'])
 def recognizeAllOnPage():
