@@ -245,10 +245,7 @@ class Raspimeter(threading.Thread):
         '''
         meter = db.getMeter(image_name.split('_')[2])
         path = ROOT_DIR + image_name
-        image = cv2.imread(path, cv2.IMREAD_COLOR)
-#         cv2.imshow("", image)
-#         cv2.waitKey(0)
-
+        image = cv2.imread(path, 0)#cv2.IMREAD_COLOR)
         timestamp_str = image_name.split('_')[0] + '_' + image_name.split('_')[1]
         timestamp = datetime.strptime(timestamp_str, DATE_FORMAT)
         meter_image, flag, digits_values = Raspimeter.recognizeMeterValue(db, meter, image)
