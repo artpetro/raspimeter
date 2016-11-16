@@ -378,7 +378,7 @@ class MeterImage(object):
         TODO adopt canny params
         '''
         if self.__edges is None:
-            ret, _ = cv2.threshold(self.__grayscaled_source_image, 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+            ret, _ = cv2.threshold(self.__grayscaled_source_image.copy(), 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
             canny_1 = ret * 0.5
             canny_2 = ret
             #print canny_1

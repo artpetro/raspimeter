@@ -229,6 +229,12 @@ class Raspimeter(threading.Thread):
         print "recognized %s" % success_recogn_count
         
         return success_recogn_count
+    
+    
+    @staticmethod
+    def deleteBulk(db, meter_id, flag):
+        if flag != 1:
+            pass
         
         
     @staticmethod
