@@ -197,33 +197,32 @@ class Raspimeter(threading.Thread):
     
     
     @staticmethod
-    def recognizeBulk(db, meter_id):
+    def recognizeBulk(db, meter_id, flag):
         '''
         '''
-        flags = (DIGITS_NOT_RECOGNIZED, NOT_TRAINED, NOT_ENOUGH_DIGITS, PREPROCESSING_ERROR, NOT_VALIDE_VALUE)
         store_recognized_images = True
         success_recogn_count = 0
         
-        for flag in flags:
-            values = db.getValuesWithImages(meter_id, flag=flag)
-            print "flag %s, values %s" % (flag, len(values))
-            counter = 0
+        values = db.getValuesWithImages(meter_id, flag=flag)
+        print "flag %s, values %s" % (flag, len(values))
+        counter = 0
         
-            for meter_value in values:
-                print "recognize %s" % counter
-                counter += 1
+        for meter_value in values:
+            print "recognize %s" % counter
+            counter += 1
                 
-                try:
-                    timestamp = meter_value.timestamp
-                    image_name = "%s_%s_%s.png" % (timestamp.strftime('%Y-%m-%d_%H-%M-%S'), meter_value.meter.id, meter_value.id)
-                    flag = Raspimeter.readAndRecognizeImage(db, image_name, store_recognized_images)[1]
+            try:
+                timestamp = meter_value.timestamp
+                image_name = "%s_%s_%s.png" % (timestamp.strftime('%Y-%m-%d_%H-%M-%S'), meter_value.meter.id, meter_value.id)
+                flag = Raspimeter.readAndRecognizeImage(db, image_name, store_recognized_images)[1]
                 
-                    if flag == VALIDE_VALUE:
-                        print "success"
-                        success_recogn_count += 1
+                if flag == VALIDE_VALUE:
+                    print "success"
+                    success_recogn_count += 1
                 
-                except Exception as e:
-                    traceback.print_exc()
+            except Exception as e:
+                traceback.print_exc()
+            
                     
         
         print "recognized %s" % success_recogn_count
@@ -288,9 +287,3 @@ class Raspimeter(threading.Thread):
             print "file not found %s" % image_name
             
             
-if __name__ == '__main__':
-    from db.mongo_db_manager import MongoDataBaseManager as mdb
-    meters = mdb.getMeters()
-    for meter in meters:
-        Raspimeter.recognizeBulk(mdb, meter.id)
-        
