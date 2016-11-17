@@ -235,26 +235,40 @@ class Raspimeter(threading.Thread):
         '''
         '''
         valid_values = db.getValuesWithImages(meter_id, flag=VALIDE_VALUE)
-        not_valid_values = db.getValuesWithImages(meter_id, flag=NOT_VALIDE_VALUE)
         print "val_values %s" % len(valid_values)
-        print "n_val_values %s" % len(not_valid_values)
         
         counter = 0
+        tmp = 0
         
         for meter_value in valid_values:
             flag = Raspimeter.validateMeterValue(db, meter_id, meter_value.numeric_value, meter_value.timestamp)
             if flag != VALIDE_VALUE:
+                print "not_valid"
                 db.updateMeterValue(meter_value)
                 counter +=1
+                
+            print tmp
+            tmp += 1
+            
+                
             
         print "invalide %s of %s" % (counter, len(valid_values))
         counter = 0
+        tmp = 0
+        
+        
+        not_valid_values = db.getValuesWithImages(meter_id, flag=NOT_VALIDE_VALUE)
+        print "n_val_values %s" % len(not_valid_values)
         
         for meter_value in not_valid_values:
             flag = Raspimeter.validateMeterValue(db, meter_id, meter_value.numeric_value, meter_value.timestamp)
             if flag == VALIDE_VALUE:
+                print "valid"
                 db.updateMeterValue(meter_value)
                 counter +=1
+                
+            print tmp
+            tmp += 1
                 
         print "valid %s of %s" % (counter, len(not_valid_values))
             
