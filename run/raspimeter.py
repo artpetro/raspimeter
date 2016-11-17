@@ -136,7 +136,7 @@ class Raspimeter(threading.Thread):
         
         if flag == RECOGNIZED:
             numeric_value = int(''.join(map(str, digits_values)))
-            flag = Raspimeter.validateMeterValue(db, meter.id, numeric_value, timestamp)
+            flag, _, _ = Raspimeter.validateMeterValue(db, meter.id, numeric_value, timestamp)
             
         meter_value_id = db.storeMeterValue(meter.id, timestamp, flag, numeric_value)
             
@@ -157,15 +157,18 @@ class Raspimeter(threading.Thread):
         # get last recognized value
         last_value = db.getLastValideMeterValue(meter_id, timestamp)
         next_value = db.getNextValideMeterValue(meter_id, timestamp)
+        flag = NOT_VALIDE_VALUE
         
         if last_value <= numeric_value:
             if next_value is None:
-                return VALIDE_VALUE
+                flag = VALIDE_VALUE
             elif numeric_value <= next_value.numeric_value:
-                return VALIDE_VALUE
-        
-        return NOT_VALIDE_VALUE
-        
+                flag = VALIDE_VALUE
+
+        if next_value is not None:
+            next_value = next_value.numeric_value
+            
+        return flag, last_value, next_value
         
         
     @staticmethod
@@ -241,11 +244,13 @@ class Raspimeter(threading.Thread):
         tmp = 0
         
         for meter_value in valid_values:
-            flag = Raspimeter.validateMeterValue(db, meter_id, meter_value.numeric_value, meter_value.timestamp)
+            flag, last, next = Raspimeter.validateMeterValue(db, meter_id, meter_value.numeric_value, meter_value.timestamp)
             if flag != VALIDE_VALUE:
-                print "not_valid %s" % meter_value.numeric_value
+                print "NOT_valid %s last: %s next: %s" % (meter_value.numeric_value, last, next)
                 db.updateMeterValue(meter_value)
                 counter +=1
+            else:
+                print "valid %s last: %s next: %s" % (meter_value.numeric_value, last, next)
                 
             print tmp
             tmp += 1
@@ -261,11 +266,14 @@ class Raspimeter(threading.Thread):
         print "n_val_values %s" % len(not_valid_values)
         
         for meter_value in not_valid_values:
-            flag = Raspimeter.validateMeterValue(db, meter_id, meter_value.numeric_value, meter_value.timestamp)
+            flag, last, next = Raspimeter.validateMeterValue(db, meter_id, meter_value.numeric_value, meter_value.timestamp)
             if flag == VALIDE_VALUE:
-                print "valid"
+                print "valid %s last: %s next: %s" % (meter_value.numeric_value, last, next)
                 db.updateMeterValue(meter_value)
                 counter +=1
+                
+            else:
+                print "NOT_valid %s last: %s next: %s" % (meter_value.numeric_value, last, next)
                 
             print tmp
             tmp += 1
