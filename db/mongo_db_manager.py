@@ -283,6 +283,13 @@ class MongoDataBaseManager():
         
         return meter_value.id
     
+    @staticmethod   
+    def updateMeterValue(meter_value):
+        '''
+        '''
+        MongoDataBaseManager.updatePeriodicConsumptions(meter_value.timestamp, meter_value.meter)
+        meter_value.update_one()
+    
                   
     @staticmethod   
     def getLastValideMeterValue(meter_id, timestamp):
@@ -303,7 +310,7 @@ class MongoDataBaseManager():
         meter = Meter.objects(id=meter_id).first()
         meter_value = MeterValue.objects(meter=meter, flag=VALIDE_VALUE, timestamp__gt=timestamp).order_by('timestamp').first()
         
-        return meter_value.numeric_value
+        return meter_value
         
              
     @staticmethod   

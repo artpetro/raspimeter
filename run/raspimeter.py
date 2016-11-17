@@ -161,7 +161,7 @@ class Raspimeter(threading.Thread):
         if last_value <= numeric_value:
             if next_value is None:
                 return VALIDE_VALUE
-            elif numeric_value <= next_value:
+            elif numeric_value <= next_value.numeric_value:
                 return VALIDE_VALUE
         
         return NOT_VALIDE_VALUE
@@ -231,6 +231,38 @@ class Raspimeter(threading.Thread):
     
     
     @staticmethod
+    def validateBulk(db, meter_id):
+        '''
+        '''
+        valid_values = db.getValuesWithImages(meter_id, flag=VALIDE_VALUE)
+        not_valid_values = db.getValuesWithImages(meter_id, flag=NOT_VALIDE_VALUE)
+        print "val_values %s" % len(valid_values)
+        print "n_val_values %s" % len(not_valid_values)
+        
+        counter = 0
+        
+        for meter_value in valid_values:
+            flag = Raspimeter.validateMeterValue(db, meter_id, meter_value.numeric_value, meter_value.timestamp)
+            if flag != VALIDE_VALUE:
+                db.updateMeterValue(meter_value)
+                counter +=1
+            
+        print "invalide %s of %s" % (counter, len(valid_values))
+        counter = 0
+        
+        for meter_value in not_valid_values:
+            flag = Raspimeter.validateMeterValue(db, meter_id, meter_value.numeric_value, meter_value.timestamp)
+            if flag == VALIDE_VALUE:
+                db.updateMeterValue(meter_value)
+                counter +=1
+                
+        print "valid %s of %s" % (counter, len(not_valid_values))
+            
+            
+            
+    
+    
+    @staticmethod
     def deleteBulk(db, meter_id, flag):
         if flag != 1:
             pass
@@ -288,5 +320,14 @@ class Raspimeter(threading.Thread):
             
         except:
             print "file not found %s" % image_name
+            
+            
+if __name__ == '__main__':
+    from db.mongo_db_manager import MongoDataBaseManager as db
+    meters = db.getMeters()
+    
+    for meter in meters:
+        Raspimeter.validateBulk(db, meter.id)
+        
             
             
