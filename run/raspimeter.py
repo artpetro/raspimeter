@@ -152,17 +152,19 @@ class Raspimeter(threading.Thread):
     @staticmethod
     def validateMeterValue(db, meter_id, numeric_value, timestamp):
         '''
-        TODO implement depends on meter settings
+        TODO add check of meter max_consumption
         '''
         # get last recognized value
         last_value = db.getLastValideMeterValue(meter_id, timestamp)
-        # TODO get next valide value
+        next_value = db.getNextValideMeterValue(meter_id, timestamp)
         
         if last_value <= numeric_value:
-            return VALIDE_VALUE
+            if next_value is None:
+                return VALIDE_VALUE
+            elif numeric_value <= next_value:
+                return VALIDE_VALUE
         
-        else:
-            return NOT_VALIDE_VALUE
+        return NOT_VALIDE_VALUE
         
         
         

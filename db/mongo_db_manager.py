@@ -263,6 +263,15 @@ class MongoDataBaseManager():
             return 0
         
         return meter_value.numeric_value
+    
+    @staticmethod   
+    def getNextValideMeterValue(meter_id, timestamp):
+        '''
+        '''
+        meter = Meter.objects(id=meter_id).first()
+        meter_value = MeterValue.objects(meter=meter, flag=VALIDE_VALUE, timestamp__gt=timestamp).order_by('timestamp').first()
+        
+        return meter_value.numeric_value
         
              
     @staticmethod   

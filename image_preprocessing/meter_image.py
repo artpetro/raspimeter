@@ -42,7 +42,6 @@ class MeterImage(object):
         self.__rgb_source_image = source_image
         self.__grayscaled_source_image = self.__getPreparedImage(source_image.copy())
         self.__digits_number = meter.meter_settings.digits_number
-        self.__edges = None
     
     
     def getMeter(self):
@@ -369,19 +368,15 @@ class MeterImage(object):
         
     def __getCannyEdges(self):
         '''
-        TODO adopt canny params
         '''
-        if 1:#self.__edges is None:
-            ret, _ = cv2.threshold(self.__grayscaled_source_image.copy(), 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
-            canny_1 = ret * 0.5
-            canny_2 = ret
+        ret, _ = cv2.threshold(self.__grayscaled_source_image.copy(), 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+        canny_1 = ret * 0.5
+        canny_2 = ret
             #print canny_1
             #print canny_2
     #         canny_1 = self.__meter_image_settings.canny_1
     #         canny_2 = self.__meter_image_settings.canny_2
-            self.__edges = cv2.Canny(self.__grayscaled_source_image, canny_1, canny_2)
-        
-        return self.__edges    
+        return cv2.Canny(self.__grayscaled_source_image, canny_1, canny_2)
     
     
     def __rotate(self, angle):
