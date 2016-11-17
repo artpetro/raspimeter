@@ -197,6 +197,14 @@ class MongoDataBaseManager():
             return MeterValue.objects(has_image=True, meter=meter)  
         else: 
             return MeterValue.objects(has_image=True, flag=flag, meter=meter)
+    
+    
+    @staticmethod
+    def getValues(meter_id=1, flag=ALL_VALUES):
+        '''
+        '''
+        meter = Meter.objects(id=meter_id).first()
+        return MeterValue.objects(meter=meter, flag=flag).order_by("timestamp")  
              
 
     @staticmethod
