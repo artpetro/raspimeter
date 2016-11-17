@@ -200,16 +200,48 @@ class MongoDataBaseManager():
              
 
     @staticmethod
-    def getImagesWithPagination(meter_id=1, image_requiered=True, flag=ALL_VALUES, page=1, per_page=10):
+    def getImagesWithPagination(meter_id=1, 
+                                image_requiered=True, 
+                                flag=ALL_VALUES, page=1, 
+                                per_page=10, 
+                                start_date=None,
+                                end_date=None):
         '''
         '''
+        date_format = '%Y-%m-%d %H:%M:%S'
+        try: 
+            start_date = datetime.strptime(start_date, date_format)
+            end_date = datetime.strptime(end_date, date_format)
+        except Exception:
+            start_date = end_date = None
+        
         meter = Meter.objects(id=meter_id).first()
         
-        if image_requiered:
-            meter_values = MeterValue.objects(has_image=True, meter=meter) if flag == ALL_VALUES else MeterValue.objects(has_image=True, flag=flag, meter=meter)
-
+        if start_date is None:
+            if image_requiered:
+                if flag == ALL_VALUES:
+                    meter_values = MeterValue.objects(has_image=True, meter=meter)  
+                else: 
+                    MeterValue.objects(has_image=True, flag=flag, meter=meter)
+    
+            else:
+                if flag == ALL_VALUES:
+                    meter_values = MeterValue.objects(meter=meter)  
+                else: 
+                    MeterValue.objects(flag=flag, meter=meter)
+                
         else:
-            meter_values = MeterValue.objects(meter=meter) if flag == ALL_VALUES else MeterValue.objects(flag=flag, meter=meter)
+            if image_requiered:
+                if flag == ALL_VALUES:
+                    meter_values = MeterValue.objects(has_image=True, meter=meter, timestamp__gte=start_date, timestamp__lte=end_date)  
+                else: 
+                    MeterValue.objects(has_image=True, flag=flag, meter=meter, timestamp__gte=start_date, timestamp__lte=end_date)
+    
+            else:
+                if flag == ALL_VALUES:
+                    meter_values = MeterValue.objects(meter=meter, timestamp__gte=start_date, timestamp__lte=end_date)  
+                else: 
+                    MeterValue.objects(flag=flag, meter=meter, timestamp__gte=start_date, timestamp__lte=end_date)
 
         return meter_values.paginate(page=page, per_page=per_page)
     

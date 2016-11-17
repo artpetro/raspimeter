@@ -9,14 +9,19 @@ $(function() {
 
 	var meterId = $("#meter-tabs").attr("meter_id");
 
-	loadImagesTab($("#meter-tabs-images"), '/images', meterId, 1, -1);
+	loadImagesTab($("#meter-tabs-images"), '/images', meterId, 1, -1, "", "");
 	loadValuesTab($("#meter-tabs-values"), '/values', meterId, 1, -1);
 	loadKNNData($("#meter-tabs-knn-data"), '/knn_data', meterId);
 
-	function loadImagesTab(tab, url, meterId, page, flag) {
+	function loadImagesTab(tab, url, meterId, page, flag, start, end) {
 
-		tab.load(url + "?meter_id=" + meterId + "&flag=" + flag + "&page="
-				+ page, function() {
+		tab.load(url 
+				+ "?meter_id=" + meterId 
+				+ "&flag=" + flag 
+				+ "&page=" + page 
+				+ "&start_date=" + start
+				+ "&end_date=" + end, 
+				function() {
 			
 			$("img.lazy").lazyload({
 				event : 'scroll load-images'
@@ -26,6 +31,7 @@ $(function() {
 			
 			filterHandler(tab, url, meterId, page);
 			images();
+			renderDateRangePicker(tab, url, meterId, page, flag);
 
 			addSingleImageButtonsHandler();
 			addPreviewCloseHandler();
@@ -37,10 +43,35 @@ $(function() {
 			tab.find('.pagination > a').click(function(event) {
 				event.preventDefault();
 				var page = $(event.target).text();
-				loadImagesTab(tab, url, meterId, page, flag);
+				loadImagesTab(tab, url, meterId, page, flag, start, end);
 			});
 		});
 	}
+	
+	function renderDateRangePicker(tab, url, meterId, page, flag) {
+
+		var datePicker = tab.find("#date-range-picker");
+
+		datePicker.daterangepicker({
+		     datepickerOptions : {
+		         numberOfMonths : 2,
+		         maxDate: null,
+		     }
+		 });
+			
+		datePicker.on('change', function(event) { 
+			var DATE_FORMAT = "YYYY-MM-DD HH:mm:ss";	
+			var range = datePicker.daterangepicker("getRange");
+			var startMoment = moment(range.start);
+			var endMoment = moment(range.end).add(1, 'days').subtract(1, 'seconds');
+			var start = encodeURIComponent(moment(startMoment).format(DATE_FORMAT));
+			var end = encodeURIComponent(moment(endMoment).format(DATE_FORMAT));
+			
+			loadImagesTab(tab, url, meterId, 1, flag, start, end);
+				
+		});
+	}
+	
 
 	
 	function loadValuesTab(tab, url, meterId, page, flag) {
@@ -150,7 +181,7 @@ $(function() {
 			
 			var flag = $(this).val();
 
-			loadImagesTab(tab, url, meterId, page, flag);
+			loadImagesTab(tab, url, meterId, 1, flag);
 
 		});
 

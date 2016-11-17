@@ -53,8 +53,18 @@ def renderImagesWithPagination():
     
     except TypeError:
         page = 1
+        
+    start_date = request.args.get('start_date')
+    end_date = request.args.get('end_date')
+        
     
-    pagination = db.getImagesWithPagination(meter_id=meter_id, image_requiered=True, flag=flag, page=page, per_page=20)
+    pagination = db.getImagesWithPagination(meter_id=meter_id, 
+                                            image_requiered=True, 
+                                            flag=flag, 
+                                            page=page, 
+                                            per_page=20,
+                                            start_date=start_date,
+                                            end_date=end_date)
     
     flags = ["OK", "RNV", "NT", "IV", "DNR", "NED", "D", "PE"]
     
