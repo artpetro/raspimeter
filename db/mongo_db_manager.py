@@ -288,7 +288,7 @@ class MongoDataBaseManager():
         '''
         '''
         MongoDataBaseManager.updatePeriodicConsumptions(meter_value.timestamp, meter_value.meter)
-        meter_value.update_one()
+        MeterValue.objects(id=meter_value.id).update_one(set__flag=meter_value.flag, upsert=False)
     
                   
     @staticmethod   

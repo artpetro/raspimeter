@@ -243,7 +243,7 @@ class Raspimeter(threading.Thread):
         for meter_value in valid_values:
             flag = Raspimeter.validateMeterValue(db, meter_id, meter_value.numeric_value, meter_value.timestamp)
             if flag != VALIDE_VALUE:
-                print "not_valid"
+                print "not_valid %s" % meter_value.numeric_value
                 db.updateMeterValue(meter_value)
                 counter +=1
                 
