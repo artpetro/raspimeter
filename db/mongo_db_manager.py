@@ -148,9 +148,6 @@ class MongoDataBaseManager():
     @staticmethod
     def getImage(image_id):
         '''
-        TODO rename to get meter_numeric_value_and_image and argument=image_name
-        TODO remove id in ret dict
-        
         '''
         meter_value = MeterValue.objects(id=image_id).first()
         meter_id = meter_value.meter.id
@@ -362,7 +359,7 @@ class MongoDataBaseManager():
     @staticmethod
     def deleteAllSuccRecImages(meter_id):
         '''
-        method to remove all success full recognized images from file system 
+        remove all success recognized images from file system 
         '''
         meter = Meter.objects(id=meter_id).first()
         meter_values = MeterValue.objects(meter=meter, flag=VALIDE_VALUE)
@@ -378,8 +375,8 @@ class MongoDataBaseManager():
     @staticmethod
     def updatePeriodicConsumptions(date, meter):
         '''
-            TODO called on create, update or delete of MeterValue if MeterValue.flag==VALIDE_VALUE or 
-            flag changed from VALIDE_VALUE to other
+            call on create, update or delete of MeterValue if MeterValue.flag==VALIDE_VALUE or 
+            if flag was changed from VALIDE_VALUE to other
         '''
         for period in ('h', 'd', 'w', 'm', 'y'):
             period_start_date = MongoDataBaseManager.getPeriodStart(date, period)
@@ -491,7 +488,7 @@ class MongoDataBaseManager():
         '''
         575281fdca18a21894d35cf5
         period=h
-        start_date=2016-05-04 00:00:00
+        start_date=2016-05-04 00:00:00 (local user browser date)
         end_date=2016-06-04 11:06:48
         '''
         data = []

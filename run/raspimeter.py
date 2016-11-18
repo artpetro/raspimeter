@@ -152,22 +152,25 @@ class Raspimeter(threading.Thread):
     @staticmethod
     def validateMeterValue(db, meter, numeric_value, timestamp):
         '''
-        TODO add check of meter max_consumption
         '''
         last_value = db.getLastValideMeterValue(meter.id, timestamp)
         next_value = db.getNextValideMeterValue(meter.id, timestamp)
         flag = NOT_VALIDE_VALUE
         last_value_numeric = 0
+        next_value_numeric = 0
         
         if last_value is not None:
             last_value_numeric = last_value.numeric_value
+            
+        if next_value is not None:
+            next_value_numeric = next_value.numeric_value
+            
         
         if last_value_numeric <= numeric_value:
             if next_value is None:
                 flag = VALIDE_VALUE
-            elif numeric_value <= next_value.numeric_value:
+            elif numeric_value <= next_value_numeric:
                 flag = VALIDE_VALUE
-                next_value = next_value.numeric_value
         
         # check consumption
         if last_value is not None and flag == VALIDE_VALUE:
@@ -175,14 +178,12 @@ class Raspimeter(threading.Thread):
             seconds = delta.seconds
             dec_places = meter.meter_settings.decimal_places
             max_cons_per_minute = meter.meter_settings.max_consumption_per_minute
-            
             max_allowed_cons = max_cons_per_minute * seconds * 10**3 / 60
             cons = numeric_value - last_value_numeric
             if cons > max_allowed_cons:
-#                 print "consumption error %s %s" % (cons, max_allowed_cons)
                 flag = NOT_VALIDE_VALUE
 
-        return flag, last_value_numeric, next_value
+        return flag, last_value_numeric, next_value_numeric
         
         
     @staticmethod
@@ -200,15 +201,11 @@ class Raspimeter(threading.Thread):
             image_name = "%s_%s_%s.png" % (timestamp.strftime('%Y-%m-%d_%H-%M-%S'), meter_value.meter.id, meter_value.id)
             
             if meter_value.flag in flags:
-                #print "recognize %d" % meter_value.flag
                 flag = Raspimeter.readAndRecognizeImage(db, image_name, store_recognized_images)[1]
-                #print "new flag %d" % flag
             
                 if flag == VALIDE_VALUE:
                     success_recogn_count += 1
         
-        #print success_recogn_count
-                
         return success_recogn_count
     
     
@@ -349,6 +346,7 @@ if __name__ == '__main__':
     start_date = datetime.strptime(start_date, date_format)
     
     for meter in meters:
+        Raspimeter.validateBulk(db, meter, start_date, VALIDE_VALUE)
         Raspimeter.validateBulk(db, meter, start_date, NOT_VALIDE_VALUE)
         
             
