@@ -518,10 +518,10 @@ class MongoDataBaseManager():
             consumptions = Consumption.objects(meter=meter, period=period, timestamp__gte=start_date, timestamp__lte=end_date) 
              
             epoch = datetime.utcfromtimestamp(0)
-            seconds_offset = tz.tzlocal().utcoffset(datetime.now()).total_seconds()
                 
             for consumption in consumptions:
                 # millis for highchart
+                seconds_offset = tz.tzlocal().utcoffset(consumption.timestamp).total_seconds()
                 milliseconds = int((consumption.timestamp - epoch).total_seconds() - seconds_offset) * 1000
                 
                 if show_date_as_string:
