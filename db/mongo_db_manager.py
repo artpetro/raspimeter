@@ -306,10 +306,7 @@ class MongoDataBaseManager():
         meter = Meter.objects(id=meter_id).first()
         meter_value = MeterValue.objects(meter=meter, flag=VALIDE_VALUE, timestamp__lt=timestamp).order_by('-timestamp').first()
         
-        if not meter_value:
-            return 0
-        
-        return meter_value.numeric_value
+        return meter_value
     
     @staticmethod   
     def getNextValideMeterValue(meter_id, timestamp):

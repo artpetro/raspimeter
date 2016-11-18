@@ -136,7 +136,7 @@ class Raspimeter(threading.Thread):
         
         if flag == RECOGNIZED:
             numeric_value = int(''.join(map(str, digits_values)))
-            flag, _, _ = Raspimeter.validateMeterValue(db, meter.id, numeric_value, timestamp)
+            flag, _, _ = Raspimeter.validateMeterValue(db, meter, numeric_value, timestamp)
             
         meter_value_id = db.storeMeterValue(meter.id, timestamp, flag, numeric_value)
             
@@ -150,25 +150,39 @@ class Raspimeter(threading.Thread):
             
     
     @staticmethod
-    def validateMeterValue(db, meter_id, numeric_value, timestamp):
+    def validateMeterValue(db, meter, numeric_value, timestamp):
         '''
         TODO add check of meter max_consumption
         '''
-        # get last recognized value
-        last_value = db.getLastValideMeterValue(meter_id, timestamp)
-        next_value = db.getNextValideMeterValue(meter_id, timestamp)
+        last_value = db.getLastValideMeterValue(meter.id, timestamp)
+        next_value = db.getNextValideMeterValue(meter.id, timestamp)
         flag = NOT_VALIDE_VALUE
+        last_value_numeric = 0
         
-        if last_value <= numeric_value:
+        if last_value is not None:
+            last_value_numeric = last_value.numeric_value
+        
+        if last_value_numeric <= numeric_value:
             if next_value is None:
                 flag = VALIDE_VALUE
             elif numeric_value <= next_value.numeric_value:
                 flag = VALIDE_VALUE
-
-        if next_value is not None:
-            next_value = next_value.numeric_value
+                next_value = next_value.numeric_value
+        
+        # check consumption
+        if last_value is not None and flag == VALIDE_VALUE:
+            delta = timestamp - last_value.timestamp
+            seconds = delta.seconds
+            dec_places = meter.meter_settings.decimal_places
+            max_cons_per_minute = meter.meter_settings.max_consumption_per_minute
             
-        return flag, last_value, next_value
+            max_allowed_cons = max_cons_per_minute * seconds * 10**3 / 60
+            cons = numeric_value - last_value_numeric
+            if cons > max_allowed_cons:
+#                 print "consumption error %s %s" % (cons, max_allowed_cons)
+                flag = NOT_VALIDE_VALUE
+
+        return flag, last_value_numeric, next_value
         
         
     @staticmethod
@@ -234,10 +248,10 @@ class Raspimeter(threading.Thread):
     
     
     @staticmethod
-    def validateBulk(db, meter_id, start_date):
+    def validateBulk(db, meter, start_date):
         '''
         '''
-        valid_values = db.getValues(meter_id, flag=VALIDE_VALUE, start_date=start_date)
+        valid_values = db.getValues(meter.id, flag=VALIDE_VALUE, start_date=start_date)
         print "val_values %s" % len(valid_values)
         val_c = len(valid_values)
         
@@ -246,7 +260,7 @@ class Raspimeter(threading.Thread):
         
         for meter_value in valid_values:
             flag, last, next = Raspimeter.validateMeterValue(db, 
-                                                             meter_id, 
+                                                             meter, 
                                                              meter_value.numeric_value, 
                                                              meter_value.timestamp)
             status = "valid"
@@ -257,7 +271,8 @@ class Raspimeter(threading.Thread):
                 counter +=1
             
             tmp += 1
-            print "%s %s last: %s next: %s (%s of %s)" % (status, meter_value.numeric_value, 
+            print "%s (Date: %s) %s last: %s next: %s (%s of %s)" % (status, meter_value.timestamp,
+                                                                     meter_value.numeric_value, 
                                                           last, next, tmp, val_c)
             
                 
@@ -266,12 +281,12 @@ class Raspimeter(threading.Thread):
         counter = 0
         tmp = 0
         
-        not_valid_values = db.getValues(meter_id, flag=NOT_VALIDE_VALUE, start_date=start_date)
+        not_valid_values = db.getValues(meter.id, flag=NOT_VALIDE_VALUE, start_date=start_date)
         print "n_val_values %s" % len(not_valid_values)
         val_c = len(valid_values)
         
         for meter_value in not_valid_values:
-            flag, last, next = Raspimeter.validateMeterValue(db, meter_id, meter_value.numeric_value, meter_value.timestamp)
+            flag, last, next = Raspimeter.validateMeterValue(db, meter, meter_value.numeric_value, meter_value.timestamp)
             status = "NOT_valid"
             if flag == VALIDE_VALUE:
                 status = "valid"
@@ -280,7 +295,7 @@ class Raspimeter(threading.Thread):
                 counter +=1
             
             tmp += 1
-            print "%s %s last: %s next: %s (%s of %s)" % (status, meter_value.numeric_value, 
+            print "%s (Date: %s) %s last: %s next: %s (%s of %s)" % (status, meter_value.timestamp, meter_value.numeric_value, 
                                                           last, next, tmp, val_c)
                     
                 
@@ -353,12 +368,12 @@ class Raspimeter(threading.Thread):
 if __name__ == '__main__':
     from db.mongo_db_manager import MongoDataBaseManager as db
     meters = db.getMeters()
-    
+    start_date = '2016-08-01 00:00:00'
     date_format = '%Y-%m-%d %H:%M:%S'
     start_date = datetime.strptime(start_date, date_format)
     
     for meter in meters:
-        Raspimeter.validateBulk(db, meter.id)
+        Raspimeter.validateBulk(db, meter, start_date)
         
             
             
