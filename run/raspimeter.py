@@ -248,25 +248,28 @@ class Raspimeter(threading.Thread):
     
     
     @staticmethod
-    def validateBulk(db, meter, start_date):
+    def validateBulk(db, meter, start_date, flag):
         '''
         '''
-        valid_values = db.getValues(meter.id, flag=VALIDE_VALUE, start_date=start_date)
-        print "val_values %s" % len(valid_values)
-        val_c = len(valid_values)
+        if flag not in (VALIDE_VALUE, NOT_VALIDE_VALUE):
+            return
         
+        values = db.getValues(meter.id, flag=flag, start_date=start_date)
+        val_c = len(values)
+        print "values %s" % val_c
         counter = 0
         tmp = 0
         
-        for meter_value in valid_values:
-            flag, last, next = Raspimeter.validateMeterValue(db, 
+        for meter_value in values:
+            value_flag, last, next = Raspimeter.validateMeterValue(db, 
                                                              meter, 
                                                              meter_value.numeric_value, 
                                                              meter_value.timestamp)
-            status = "valid"
-            if flag != VALIDE_VALUE:
-                status = "NOT_valid"
-                meter_value.flag = flag
+            
+            status = "valid" if flag == VALIDE_VALUE else "NOT_valid"
+            if value_flag != flag:
+                status = "NOT_valid" if flag == VALIDE_VALUE else "valid"
+                meter_value.flag = value_flag
                 db.updateMeterValue(meter_value)
                 counter +=1
             
@@ -274,37 +277,10 @@ class Raspimeter(threading.Thread):
             print "%s (Date: %s) %s last: %s next: %s (%s of %s)" % (status, meter_value.timestamp,
                                                                      meter_value.numeric_value, 
                                                           last, next, tmp, val_c)
-            
-                
-            
-        print "invalide %s of %s" % (counter, len(valid_values))
-        counter = 0
-        tmp = 0
         
-        not_valid_values = db.getValues(meter.id, flag=NOT_VALIDE_VALUE, start_date=start_date)
-        print "n_val_values %s" % len(not_valid_values)
-        val_c = len(valid_values)
-        
-        for meter_value in not_valid_values:
-            flag, last, next = Raspimeter.validateMeterValue(db, meter, meter_value.numeric_value, meter_value.timestamp)
-            status = "NOT_valid"
-            if flag == VALIDE_VALUE:
-                status = "valid"
-                meter_value.flag = flag
-                db.updateMeterValue(meter_value)
-                counter +=1
-            
-            tmp += 1
-            print "%s (Date: %s) %s last: %s next: %s (%s of %s)" % (status, meter_value.timestamp, meter_value.numeric_value, 
-                                                          last, next, tmp, val_c)
-                    
-                
-        print "valid %s of %s" % (counter, len(not_valid_values))
+        print "changed %s of %s" % (counter, val_c)
             
             
-            
-    
-    
     @staticmethod
     def deleteBulk(db, meter_id, flag):
         if flag != 1:
@@ -373,7 +349,7 @@ if __name__ == '__main__':
     start_date = datetime.strptime(start_date, date_format)
     
     for meter in meters:
-        Raspimeter.validateBulk(db, meter, start_date)
+        Raspimeter.validateBulk(db, meter, start_date, NOT_VALIDE_VALUE)
         
             
             
