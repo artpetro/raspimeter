@@ -13,8 +13,16 @@ $(function() {
 	loadValuesTab($("#meter-tabs-values"), '/values', meterId, 1, -1);
 	loadKNNData($("#meter-tabs-knn-data"), '/knn_data', meterId);
 
-	function loadImagesTab(tab, url, meterId, page, flag, start, end) {
-
+	function loadImagesTab(tab, url, meterId, page, flag) {
+		
+		var datePicker = tab.find("#date-range-picker");
+		var DATE_FORMAT = "YYYY-MM-DD HH:mm:ss";	
+		var range = datePicker.daterangepicker("getRange");
+		var startMoment = moment(range.start);
+		var endMoment = moment(range.end).add(1, 'days').subtract(1, 'seconds');
+		var start = encodeURIComponent(moment(startMoment).format(DATE_FORMAT));
+		var end = encodeURIComponent(moment(endMoment).format(DATE_FORMAT));
+		
 		tab.load(url 
 				+ "?meter_id=" + meterId 
 				+ "&flag=" + flag 
@@ -31,7 +39,7 @@ $(function() {
 			
 			filterHandler(tab, url, meterId, page);
 			images();
-			renderDateRangePicker(tab, url, meterId, page, flag);
+			renderDateRangePicker(tab, url, meterId, page, flag, startMoment, endMoment);
 
 			addSingleImageButtonsHandler();
 			addPreviewCloseHandler();
@@ -48,7 +56,7 @@ $(function() {
 		});
 	}
 	
-	function renderDateRangePicker(tab, url, meterId, page, flag) {
+	function renderDateRangePicker(tab, url, meterId, page, flag, startMoment, endMoment) {
 
 		var datePicker = tab.find("#date-range-picker");
 
@@ -58,16 +66,17 @@ $(function() {
 		         maxDate: null,
 		     }
 		 });
-			
+		
+		var startDate = startMoment.toDate();
+		var endDate = endMoment.toDate();
+		
+		if (startMoment.isValid() && endMoment.isValid()) {
+			datePicker.daterangepicker("setRange", {start: startDate, end: endDate});
+		}
+		
 		datePicker.on('change', function(event) { 
-			var DATE_FORMAT = "YYYY-MM-DD HH:mm:ss";	
-			var range = datePicker.daterangepicker("getRange");
-			var startMoment = moment(range.start);
-			var endMoment = moment(range.end).add(1, 'days').subtract(1, 'seconds');
-			var start = encodeURIComponent(moment(startMoment).format(DATE_FORMAT));
-			var end = encodeURIComponent(moment(endMoment).format(DATE_FORMAT));
 			
-			loadImagesTab(tab, url, meterId, 1, flag, start, end);
+			loadImagesTab(tab, url, meterId, 1, flag);//), startMoment, endMoment);
 				
 		});
 	}

@@ -234,10 +234,10 @@ class Raspimeter(threading.Thread):
     
     
     @staticmethod
-    def validateBulk(db, meter_id):
+    def validateBulk(db, meter_id, start_date):
         '''
         '''
-        valid_values = db.getValues(meter_id, flag=VALIDE_VALUE)
+        valid_values = db.getValues(meter_id, flag=VALIDE_VALUE, start_date=start_date)
         print "val_values %s" % len(valid_values)
         val_c = len(valid_values)
         
@@ -266,7 +266,7 @@ class Raspimeter(threading.Thread):
         counter = 0
         tmp = 0
         
-        not_valid_values = db.getValues(meter_id, flag=NOT_VALIDE_VALUE)
+        not_valid_values = db.getValues(meter_id, flag=NOT_VALIDE_VALUE, start_date=start_date)
         print "n_val_values %s" % len(not_valid_values)
         val_c = len(valid_values)
         
@@ -353,6 +353,9 @@ class Raspimeter(threading.Thread):
 if __name__ == '__main__':
     from db.mongo_db_manager import MongoDataBaseManager as db
     meters = db.getMeters()
+    
+    date_format = '%Y-%m-%d %H:%M:%S'
+    start_date = datetime.strptime(start_date, date_format)
     
     for meter in meters:
         Raspimeter.validateBulk(db, meter.id)
