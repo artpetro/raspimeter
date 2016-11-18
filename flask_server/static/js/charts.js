@@ -177,6 +177,8 @@ $(function () {
 				
 		});
 		
+		chart.series[3].setData([], true);
+		
 		$.getJSON( "get_weather?" 
 				+ "meter_id=" + meter['_id']['$oid']
 				+ "&period=" + period
