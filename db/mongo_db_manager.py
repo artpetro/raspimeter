@@ -12,6 +12,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from inputs.weather import Weather
     
 from datetime import datetime, timedelta
+from dateutil import tz
 import calendar
 import traceback
 import cPickle
@@ -488,7 +489,7 @@ class MongoDataBaseManager():
         '''
         575281fdca18a21894d35cf5
         period=h
-        start_date=2016-05-04 00:00:00 (local user browser date)
+        start_date=2016-05-04 00:00:00 (user browser local date)
         end_date=2016-06-04 11:06:48
         '''
         data = []
@@ -505,20 +506,23 @@ class MongoDataBaseManager():
              
             if not end_date:
                 end_date = datetime.utcnow()
-             
             else:
                 end_date = datetime.strptime(end_date, date_format)
                  
             start_date = MongoDataBaseManager.getPeriodStart(start_date, period)
             end_date = MongoDataBaseManager.getPeriodEnd(end_date, period)
+            # TODO ??
+            start_date = MongoDataBaseManager.localToUtc(start_date)
+            end_date = MongoDataBaseManager.localToUtc(end_date)
             
             consumptions = Consumption.objects(meter=meter, period=period, timestamp__gte=start_date, timestamp__lte=end_date) 
              
-            epoch = datetime.utcfromtimestamp(0) 
-             
+            epoch = datetime.utcfromtimestamp(0)
+            seconds_offset = tz.tzlocal().utcoffset(datetime.now()).total_seconds()
+                
             for consumption in consumptions:
                 # millis for highchart
-                milliseconds = int((consumption.timestamp - epoch).total_seconds()) * 1000
+                milliseconds = int((consumption.timestamp - epoch).total_seconds() - seconds_offset) * 1000
                 
                 if show_date_as_string:
                     data.append([str(consumption.timestamp), consumption.numeric_value])
@@ -712,7 +716,7 @@ class MongoDataBaseManager():
             map_f_body = """    
                 key.setDate(1);
                 key.setMonth(0);
-                key.setHours(1);
+                key.setHours(0);
             """
         
         else: 
@@ -742,6 +746,22 @@ class MongoDataBaseManager():
     def createMeter(meter_type_name, meter_name):
         mt = MeterType.objects(name=meter_type_name).first()
         MongoDataBaseManager.createAndStoreMeterAndSettings(meter_type_id=mt.id, name=meter_name)
+        
+        
+    @staticmethod
+    def localToUtc(local):
+        to_zone = tz.tzutc()
+        from_zone = tz.tzlocal()
+        local = local.replace(tzinfo=from_zone)
+        return local.astimezone(to_zone)
+    
+    @staticmethod
+    def utcToLocal(utc):
+        from_zone = tz.tzutc()
+        to_zone = tz.tzlocal()
+        utc = utc.replace(tzinfo=from_zone)
+        
+        return utc.astimezone(to_zone)
          
          
 if __name__ == '__main__':

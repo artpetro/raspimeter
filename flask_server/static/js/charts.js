@@ -168,6 +168,8 @@ $(function () {
 				+ "&start_date=" + moment(ranges[0]).format(DATE_FORMAT)
 				+ "&end_date=" + moment(ranges[1]).format(DATE_FORMAT), function(consumption) {
 					
+					console.log(consumption);
+					
 					var costsAndConsumption = calculateCostsAndConvertedConsumption(meter, consumption);
 					chart.series[0].setData(costsAndConsumption['units'], true);
 					chart.series[1].setData(costsAndConsumption['costs'], true);
@@ -181,6 +183,7 @@ $(function () {
 				+ "&start_date=" + moment(ranges[0]).format(DATE_FORMAT)
 				+ "&end_date=" + moment(ranges[1]).format(DATE_FORMAT), function(weather) {
 				
+					console.log(weather);
 					weather.forEach(function (item) {
 						item[1] = parseFloat((item[1]).toFixed(1));
 					});
@@ -261,8 +264,6 @@ $(function () {
 		var factor = 1.0/(Math.pow(10, decimalPlaces)); 
 			
 		consumption.forEach(function (item) {
-				
-			
 			var decimalValue = parseFloat((item[1] * factor).toFixed(decimalPlaces));
 			var convertedValue = parseFloat((decimalValue * calorificValue * conditionNumber).toFixed(4));
 			var cost = parseFloat((convertedValue * price).toFixed(2));
