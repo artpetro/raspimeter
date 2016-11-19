@@ -4,7 +4,9 @@ $(function () {
 	var endMoment = moment();
 	var DATE_FORMAT = "YYYY-MM-DD HH:mm:ss";
 	
-	loadChartDataAndRenderAllCharts(period, startMoment, endMoment);
+	if ($('.charts-list').size() > 0) {
+		loadChartDataAndRenderAllCharts(period, startMoment, endMoment);
+	}
 	
 	function loadChartDataAndRenderAllCharts(period, startMoment, endMoment) {
 		$.getJSON( "get_meters", function(meters) {
@@ -55,10 +57,7 @@ $(function () {
 	        xAxis: {
 	            type: 'datetime',
 	            dateTimeLabelFormats: {
-	            	millisecond:"%a, %b %e, %H:%M",
-	            	second:"%a, %b %e, %H:%M",
-	                minute:"%a, %b %e, %H:%M",
-	                hour:"%a, %b %e, %H:%M",
+	            	hour:"%a, %b %e, %H:%M",
 	                day:"%a, %b %e, %Y",
 	                week:"Week from %a, %b %e, %Y",
 	                month:"%B %Y",
@@ -282,16 +281,5 @@ $(function () {
 		
 		return costsAndConsumption;
 			
-	}
-	
-	function convertUTCDateToLocalDate(date) {
-	    var newDate = new Date(date.getTime()+date.getTimezoneOffset()*60*1000);
-
-	    var offset = date.getTimezoneOffset() / 60;
-	    var hours = date.getHours();
-
-	    newDate.setHours(hours - offset);
-
-	    return newDate;   
 	}
 });

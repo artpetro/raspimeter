@@ -1,12 +1,12 @@
 <div class="all-products page">
-
+	<div>
 	<input id="date-range-picker" name="date-range-picker">
 
 	<button id="refresh_tab_button"
 		class="ui-priority-primary ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only">
 		<span class="ui-button-text">Refresh</span>
 	</button>
-
+</div>
 	<div class="flags-filter">
 	<form>
 		<input type="radio" name="flag" value="-1" checked> All
@@ -19,24 +19,6 @@
 		<input type="radio" name="flag" value="6"> Deleted
 	</form>
 </div>
-
-<!-- div class="filters">
-		<form>
-			<div class="filter-criteria">
-				<span>Filter</span> <label>
-				<input type="checkbox"
-					name="flag" value="0">Successful recognized</label> <label><input
-					type="checkbox" name="flag" value="7">Preprocessing error</label> <label><input
-					type="checkbox" name="flag" value="2">Not trained</label> <label><input
-					type="checkbox" name="flag" value="3">Invalid value</label> <label><input
-					type="checkbox" name="flag" value="4">Digit(s) not
-					recognized</label> <label><input type="checkbox" name="flag"
-					value="5">Not enough digits</label> <label><input
-					type="checkbox" name="flag" value="6">Deleted</label> 
-			</div>
-			<button class="recognize-all-button" id="{{ pagination.page }}">Recognize all</button>
-		</form>
-	</div-->
 	
 	<div class=pagination>
         {% for page in pagination.iter_pages() %}

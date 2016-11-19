@@ -7,6 +7,7 @@ from mongo_models import MeterType, Meter, MeterValue, Consumption, KNNTrainData
     MeterImageSettings, KNNSettings, MeterSettings, CameraInput, WeatherValue
 
 import os, sys
+from pyowm.utils.timeutils import now
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
     
 from inputs.weather import Weather
@@ -218,6 +219,8 @@ class MongoDataBaseManager():
         try: 
             start_date = datetime.strptime(start_date, date_format)
             end_date = datetime.strptime(end_date, date_format)
+            start_date = MongoDataBaseManager.localToUtc(start_date)
+            end_date = MongoDataBaseManager.localToUtc(end_date)
         except Exception:
             start_date = end_date = None
         
@@ -249,7 +252,12 @@ class MongoDataBaseManager():
                 else: 
                     meter_values = MeterValue.objects(flag=flag, meter=meter, timestamp__gte=start_date, timestamp__lte=end_date)
 
-        return meter_values.paginate(page=page, per_page=per_page)
+        pagination = meter_values.paginate(page=page, per_page=per_page)
+        
+#         for meter_value in pagination.items:
+#             meter_value.timestamp = MongoDataBaseManager.utcToLocal(meter_value.timestamp)
+
+        return pagination
     
     
     @staticmethod
@@ -414,7 +422,6 @@ class MongoDataBaseManager():
             start_value = MeterValue.objects(timestamp__gte=period_start_date, 
                                              meter=meter, 
                                              flag=VALIDE_VALUE).first()
-             
             
             end_value = MeterValue.objects(timestamp__gte=next_perion_start_date, 
                                             meter=meter, 
@@ -426,7 +433,6 @@ class MongoDataBaseManager():
                                                timestamp__lte=period_end_date).order_by('-timestamp').first()
              
             numeric_value = end_value.numeric_value - start_value.numeric_value
-                 
             Consumption.objects(meter=meter, timestamp=period_start_date, period=period).upsert_one(set__numeric_value = numeric_value)
              
         except Exception as e:
@@ -440,7 +446,6 @@ class MongoDataBaseManager():
         position = meter.meter_settings.position
         weather = Weather(weather_api_key)
         #weather_timestamp = MongoDataBaseManager.getPeriodStart(timestamp, period='h')
-        
         #if weather.isApiOnline():
         current_weather = weather.getCurrentWeather(position)
             
@@ -521,7 +526,7 @@ class MongoDataBaseManager():
                 
             for consumption in consumptions:
                 # millis for highchart
-                seconds_offset = tz.tzlocal().utcoffset(consumption.timestamp).total_seconds()
+                seconds_offset = tz.tzlocal().utcoffset(consumption.timestamp).total_seconds() if period != 'h' else 0 #WARUM???
                 milliseconds = int((consumption.timestamp - epoch).total_seconds() - seconds_offset) * 1000
                 
                 if show_date_as_string:
@@ -642,6 +647,8 @@ class MongoDataBaseManager():
                  
             start_date = MongoDataBaseManager.getPeriodStart(start_date, period)
             end_date = MongoDataBaseManager.getPeriodEnd(end_date, period)
+            start_date = MongoDataBaseManager.localToUtc(start_date)
+            end_date = MongoDataBaseManager.localToUtc(end_date)
             
             map_f = MongoDataBaseManager.getMapFunction(period=period)
             
@@ -652,11 +659,9 @@ class MongoDataBaseManager():
             """
             weathers = WeatherValue.objects(meter=meter, timestamp__gte=start_date, timestamp__lte=end_date)
             
-#             for w in weathers:
-#                 print w.timestamp
-#                 print w.temperature
             if map_reduce:
-                weathers = weathers.map_reduce(map_f, reduce_f, {"replace":"COLLECTION_NAME"})
+                collection_name = 'weather_values_%s' % period
+                weathers = weathers.map_reduce(map_f, reduce_f, {"replace":collection_name})
             
             epoch = datetime.utcfromtimestamp(0) 
              
@@ -765,6 +770,7 @@ class MongoDataBaseManager():
          
          
 if __name__ == '__main__':
+    pass
 
     #MongoDataBaseManager.deleteAllSuccRecImages()
 
@@ -775,55 +781,16 @@ if __name__ == '__main__':
     #meter = Meter.objects(name='Gas Meter').first()
     #MongoDataBaseManager.setMeterForCameraInput(meter.id, 1)
     
-    API_KEY = '9d78daf127ad45a1d3f57f86e69accb4'
-    position = 'Osnabrueck, Germany'
-    
-    meter = Meter.objects().first()
-    meter.meter_settings.weather_api_key = API_KEY
-    meter.meter_settings.position = position
-    meter.meter_settings.condition_number = 0.9627
-    meter.meter_settings.value_units = 'm^3'
-    meter.meter_settings.calorific_value = 9.833
-    meter.meter_settings.unit_price = 0.09
-    
-    meter.save()
-    
-    
-#     MeterValue.drop_collection() 
-#     Consumption.drop_collection()
-    
-    
-
-#     '''
-#      DROP DataBase
-#     '''
-#     from mongoengine import connect
-#   
-#     db = connect('raspimeter')
-#     db.drop_database('raspimeter')
-#  
-#     '''
-#     CREATE MeterType
-#     '''
-#     mt = MeterType(name="Gas Meter Type")
-#     mt.save()
-#     
-#     '''
-#     create Simulated meter
-#     '''
-#     Meter.drop_collection()
-#     MeterValue.drop_collection() 
-#     Consumption.drop_collection()
-#     KNNTrainData.drop_collection()
-#     
-#     mt = MeterType.objects().first()
-#      
-#     MongoDataBaseManager.createAndStoreMeterAndSettings(meter_type_id=mt.id, name='Simulated Gas Meter 1')
-#       
-#     '''
-#     store camera input
-#     '''
-#     CameraInput.drop_collection()
+#     API_KEY = '9d78daf127ad45a1d3f57f86e69accb4'
+#     position = 'Osnabrueck, Germany'
 #     
 #     meter = Meter.objects().first()
-#     MongoDataBaseManager.storeCameraInput(meter_id=meter.id)
+#     meter.meter_settings.weather_api_key = API_KEY
+#     meter.meter_settings.position = position
+#     meter.meter_settings.condition_number = 0.9627
+#     meter.meter_settings.value_units = 'm^3'
+#     meter.meter_settings.calorific_value = 9.833
+#     meter.meter_settings.unit_price = 0.09
+#     
+#     meter.save()
+    
