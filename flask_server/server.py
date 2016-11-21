@@ -102,15 +102,18 @@ def renderKNNData():
     '''
     meter_id = request.args.get('meter_id')
     knn_data = db.getKNNData(meter_id=meter_id)
-    items = dict.fromkeys(range(0, 15))
+    items = dict.fromkeys(range(0, 10))
     
-    for i in range(0, 15):
+    for i in range(0, 10):
         items[i] = []
     
     for item in knn_data:
         img = cPickle.loads(item.src_image).getPreparedImage()
-        items[item.response].append({'image' : json.dumps(img.tolist()), 
-                                     'id': item.id})
+        try:
+            items[item.response].append({'image' : json.dumps(img.tolist()), 
+                                         'id': item.id})
+        except Exception:
+            traceback.print_exc()
         
     return render_template('knn_data.html', meter_id=meter_id, items=items)
 
