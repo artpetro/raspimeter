@@ -657,11 +657,39 @@ class MongoDataBaseManager():
                     return Array.sum(values) / values.length;
                 };
             """
+          
+# #             # increment mr_collection
+#             collection_name = 'weather_value_%s' % period
+#             try:
+#                 first_ts = WeatherValueH.objects().first().id
+#                 last_ts = WeatherValueH.objects().order_by('-id').first().id
+#                 first_ts = MongoDataBaseManager.localToUtc(first_ts)
+#                 last_ts = MongoDataBaseManager.localToUtc(last_ts)
+#                     
+#                 if start_date < first_ts:
+#                     weathers = WeatherValue.objects(meter=meter, timestamp__gte=start_date, timestamp__lte=first_ts)
+#                     weathers = weathers.map_reduce(map_f, reduce_f, {"reduce":collection_name})
+#                         
+#                 if end_date > last_ts:
+#                     weathers = WeatherValue.objects(meter=meter, timestamp__gte=start_date, timestamp__lte=first_ts)
+#                     weathers = weathers.map_reduce(map_f, reduce_f, {"reduce":collection_name})
+#                         
+#                 weathers = WeatherValueH.objects(id__gte=start_date, id__lte=end_date)
+#                 
+#             except Exception:
+#                 traceback.print_exc()
+#                 weathers = WeatherValue.objects(meter=meter, timestamp__gte=start_date, timestamp__lte=end_date)
+#                
+#                 if map_reduce:
+#                     collection_name = 'weather_value_%s' % period
+#                     weathers = weathers.map_reduce(map_f, reduce_f, {"replace":collection_name})
+               
             weathers = WeatherValue.objects(meter=meter, timestamp__gte=start_date, timestamp__lte=end_date)
-            
+                
             if map_reduce:
-                collection_name = 'weather_values_%s' % period
+                collection_name = 'weather_value_%s' % period
                 weathers = weathers.map_reduce(map_f, reduce_f, {"replace":collection_name})
+            
             
             epoch = datetime.utcfromtimestamp(0) 
              

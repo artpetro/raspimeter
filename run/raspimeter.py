@@ -341,13 +341,15 @@ class Raspimeter(threading.Thread):
 if __name__ == '__main__':
     from db.mongo_db_manager import MongoDataBaseManager as db
     meters = db.getMeters()
-    start_date = '2016-08-01 00:00:00'
-    date_format = '%Y-%m-%d %H:%M:%S'
-    start_date = datetime.strptime(start_date, date_format)
+#     start_date = '2016-08-01 00:00:00'
+#     date_format = '%Y-%m-%d %H:%M:%S'
+#     start_date = datetime.strptime(start_date, date_format)
     
     for meter in meters:
-        Raspimeter.validateBulk(db, meter, start_date, VALIDE_VALUE)
-        Raspimeter.validateBulk(db, meter, start_date, NOT_VALIDE_VALUE)
+        Raspimeter.recognizeBulk(db, meter, DIGITS_NOT_RECOGNIZED)
+#         
+#         Raspimeter.validateBulk(db, meter, start_date, VALIDE_VALUE)
+#         Raspimeter.validateBulk(db, meter, start_date, NOT_VALIDE_VALUE)
         
             
             

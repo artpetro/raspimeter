@@ -15,7 +15,6 @@ $(function () {
 			});
 		});
 	}
-	
 		
 	function renderChartContainer(meter) {
 		var meter_id = meter['_id']['$oid'];
@@ -27,11 +26,8 @@ $(function () {
 		redrawChart(meter);
 	}
 	
-	
 	function prepareChart(meter) {
-
 		var id = meter['_id']['$oid'];
-		
 		Highcharts.setOptions({
 	        global: {
 	            useUTC: false
@@ -141,7 +137,6 @@ $(function () {
 			
 	}
 
-
 	function addPeriodSelecterHandler(meter) {
 		$("#periodSelector_" + meter['_id']['$oid']).selectable({
 			stop: function() {
@@ -167,8 +162,6 @@ $(function () {
 				+ "&start_date=" + moment(ranges[0]).format(DATE_FORMAT)
 				+ "&end_date=" + moment(ranges[1]).format(DATE_FORMAT), function(consumption) {
 					
-					console.log(consumption);
-					
 					var costsAndConsumption = calculateCostsAndConvertedConsumption(meter, consumption);
 					chart.series[0].setData(costsAndConsumption['units'], true);
 					chart.series[1].setData(costsAndConsumption['costs'], true);
@@ -184,7 +177,6 @@ $(function () {
 				+ "&start_date=" + moment(ranges[0]).format(DATE_FORMAT)
 				+ "&end_date=" + moment(ranges[1]).format(DATE_FORMAT), function(weather) {
 				
-					console.log(weather);
 					weather.forEach(function (item) {
 						item[1] = parseFloat((item[1]).toFixed(1));
 					});
@@ -213,16 +205,11 @@ $(function () {
 		});
 	}
 	
-	// TODO add autoupdate chkbx
 	function addRefreshButtonHandler(meter) {
-		
 		var refreshButton = $("#refresh_button_" + meter['_id']['$oid']);
-		
 		refreshButton.click(function( event ) {
-	        
 			event.preventDefault();
 	        redrawChart(meter);
-	      
 		});
 	}
 	
@@ -232,7 +219,7 @@ $(function () {
 		var range = $("#date-range-picker_" + meterId).daterangepicker("getRange");
 		var startMoment = moment(range.start);
 		var endMoment = moment(range.end).add(1, 'days').subtract(1, 'seconds');
-		
+
 		return [startMoment, endMoment];
 	}
 		
@@ -257,11 +244,9 @@ $(function () {
 		decimalPlaces = meter.meter_settings['decimal_places'];
 		
 		var costsAndConsumption = new Object();
-		
-		cons  = [];
-		convCons = [];
-		costs = [];
-		
+		var cons  = [];
+		var convCons = [];
+		var costs = [];
 		var factor = 1.0/(Math.pow(10, decimalPlaces)); 
 			
 		consumption.forEach(function (item) {

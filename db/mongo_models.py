@@ -133,4 +133,13 @@ class WeatherValue(mongo_db_engine.Document):
     @queryset_manager
     def objects(doc_cls, queryset):
         return queryset.order_by('timestamp')
+    
+    
+class WeatherValueH(mongo_db_engine.Document):
+    '''
+    '''
+    value = mongo_db_engine.FloatField()
+    
+    
+    
 
