@@ -102,9 +102,9 @@ def renderKNNData():
     '''
     meter_id = request.args.get('meter_id')
     knn_data = db.getKNNData(meter_id=meter_id)
-    items = dict.fromkeys(range(0, 10))
+    items = dict.fromkeys(range(0, 15))
     
-    for i in range(0, 10):
+    for i in range(0, 15):
         items[i] = []
     
     for item in knn_data:
