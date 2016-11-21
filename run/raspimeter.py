@@ -346,7 +346,7 @@ if __name__ == '__main__':
 #     start_date = datetime.strptime(start_date, date_format)
     
     for meter in meters:
-        Raspimeter.recognizeBulk(db, meter, DIGITS_NOT_RECOGNIZED)
+        Raspimeter.recognizeBulk(db, meter.id, DIGITS_NOT_RECOGNIZED)
 #         
 #         Raspimeter.validateBulk(db, meter, start_date, VALIDE_VALUE)
 #         Raspimeter.validateBulk(db, meter, start_date, NOT_VALIDE_VALUE)
