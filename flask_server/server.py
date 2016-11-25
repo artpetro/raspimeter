@@ -8,7 +8,6 @@ import traceback
 
 from flask import request, send_from_directory, render_template, redirect
 from flask_mongoengine.wtf import model_form
-#from flask_wtf import Form
 from flask.ext.wtf import Form
 
 from flask_server import app 
@@ -238,7 +237,7 @@ def renderatDatabaseSettings():
     if db_name != '':
         import flask_server
         flask_server.updateDBConfig(db_name, db_password, user_password)
-        #TODO restart server app here
+        #TODO restart server and runner here
         
     return render_template('db_settings.html', db_name=db_name, db_password=db_password, user_password=user_password)
 

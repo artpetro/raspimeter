@@ -26,7 +26,6 @@ def updateDBConfig(db_name, db_password, user_password):
 
     initMongoEngine(db_name, db_password)
 
-
 config = ConfigParser.ConfigParser()
 config.read('../db/config.cfg')
 db_name = config.get('Database', 'name')
@@ -37,7 +36,3 @@ initMongoEngine(db_name, db_password)
 # db_name = 'raspimeter'
 # password = 'password'
 # initMongoEngine(db_name, password)
-
-
-    
-    

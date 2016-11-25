@@ -101,11 +101,13 @@ $(function () {
 	        },
 	        series: [{
 	            name: meter.meter_settings['value_units'],
+	            visible: false,
 	            //data: costsAndConsumption['units'],
 	            type: 'column',
 	        },
 	        {
 		        name: '€',
+		        visible: false,
 		        //data: costsAndConsumption['costs'],
 		        type: 'column',		      
 	        },
