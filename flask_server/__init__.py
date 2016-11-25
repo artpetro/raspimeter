@@ -31,13 +31,10 @@ if mongo_db_engine is None:
     config = ConfigParser.ConfigParser()
     try:
         config.read('../db/config.cfg')
-        db_name = config.get('Database', 'name')
-        db_password = config.get('Database', 'password')
     except NoSectionError:
         config.read('config.cfg')
-        db_name = config.get('Database', 'name')
-        db_password = config.get('Database', 'password')
-    
+    db_name = config.get('Database', 'name')
+    db_password = config.get('Database', 'password')
     initMongoEngine(db_name, db_password)
 
 
