@@ -1,8 +1,5 @@
-# Set the path
 import os, sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
-#from flask_server.server import mongo_db_engine
 
 from mongoengine.queryset import *
 from flask_server import mongo_db_engine

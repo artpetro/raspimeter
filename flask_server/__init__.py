@@ -26,23 +26,17 @@ def updateDBConfig(db_name, db_password, user_password):
 
     initMongoEngine(db_name, db_password)
 
-
-# if mongo_db_engine is None:
-#     config = ConfigParser.ConfigParser()
-#     try:
-#         config.read('../db/config.cfg')
-#         db_name = config.get('Database', 'name')
-#         db_password = config.get('Database', 'password')
-#         initMongoEngine(db_name, db_password)
-#     except Exception:
-#         pass
-      
+if mongo_db_engine is None:
+    config = ConfigParser.ConfigParser()
+    config.read('../db/config.cfg')
+    db_name = config.get('Database', 'name')
+    db_password = config.get('Database', 'password')
+    initMongoEngine(db_name, db_password)
     
 
-
-db_name = 'raspimeter'
-password = 'password'
-initMongoEngine(db_name, password)
+# db_name = 'raspimeter'
+# password = 'password'
+# initMongoEngine(db_name, password)
 
 
     

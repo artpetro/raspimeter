@@ -1,17 +1,11 @@
-'''
-Created on 11.01.2016
+import os, sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-@author: Artem
-'''
 from mongo_models import MeterType, Meter, MeterValue, Consumption, KNNTrainData,\
     MeterImageSettings, KNNSettings, MeterSettings, CameraInput, WeatherValue
 
-import os, sys
 from pyowm.utils.timeutils import now
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-    
 from inputs.weather import Weather
-    
 from datetime import datetime, timedelta
 from dateutil import tz
 import calendar
