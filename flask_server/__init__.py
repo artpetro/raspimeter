@@ -1,9 +1,6 @@
 from flask import Flask
 from flask.ext.mongoengine import MongoEngine
 
-import os, sys
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-
 import ConfigParser
 import os
 
@@ -36,12 +33,11 @@ if mongo_db_engine is None:
         config.read('../db/config.cfg')
         db_name = config.get('Database', 'name')
         db_password = config.get('Database', 'password')
+        initMongoEngine(db_name, db_password)
     except Exception:
-        config.read('../db/config.cfg')
-        db_name = config.get('Database', 'name')
-        db_password = config.get('Database', 'password')
-     
-    initMongoEngine(db_name, db_password)
+        pass
+      
+    
 
 
 # db_name = 'raspimeter'
