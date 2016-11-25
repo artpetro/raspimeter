@@ -28,14 +28,16 @@ class Raspimeter(threading.Thread):
     def __init__(self, db, camera_input, simulated=True, configure=True, usb=False):
         '''
         Constructor
-        TODO handle meter_id to load meter depended settings
+        TODO handle meter_id to load meter depended settings without app reload
         '''
         threading.Thread.__init__(self)
         meter = db.getMeter(camera_input.meter.id)
+        # remove temporary vars
         self.__meter = meter
         self.__meter_settings = meter.meter_settings
         self.__meter_image_settings = meter.meter_image_settings 
         self.__digits_number = meter.meter_settings.digits_number       
+        
         self.__db = db
         self.__meter_id = meter.id
         self.__knn = SingleDigitKNNRecogniser(self.__db, self.__meter_id)

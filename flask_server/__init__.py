@@ -27,18 +27,18 @@ def updateDBConfig(db_name, db_password, user_password):
     initMongoEngine(db_name, db_password)
 
 
-# TODO check if not config
-#config = ConfigParser.ConfigParser()
-#config.read('db/config.cfg')
+if mongo_db_engine is None:
+    config = ConfigParser.ConfigParser()
+    config.read('../db/config.cfg')
+    db_name = config.get('Database', 'name')
+    db_password = config.get('Database', 'password')
+    initMongoEngine(db_name, db_password)
 
-db_name = 'raspimeter'#config.get('Database', 'name')
-password = 'password'#config.get('Database', 'password')
 
-initMongoEngine(db_name, password)
-    
+# db_name = 'raspimeter'#config.get('Database', 'name')
+# password = 'password'#config.get('Database', 'password')
+# initMongoEngine(db_name, password)
 
-#app.config["MONGODB_SETTINGS"] = {'DB': "raspimeter"}
-#app.config["SECRET_KEY"] = "KeepThisS3cr3t"
 
     
     
