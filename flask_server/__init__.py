@@ -14,16 +14,17 @@ def initMongoEngine(name, password):
     app.config["SECRET_KEY"] = password
     mongo_db_engine =  MongoEngine(app)
 
-def updateDBConfig(name, password):
+def updateDBConfig(db_name, db_password, user_password):
     config = ConfigParser.ConfigParser()
     config.read('../db/config.cfg')
-    config.set('Database', 'name', name)
-    config.set('Database', 'password', password)
-
+    config.set('Database', 'name', db_name)
+    config.set('Database', 'password', db_password)
+    config.set('BasicAuth', 'password', user_password)
+    
     with open('../db/config.cfg', 'wb') as configfile:
         config.write(configfile)
 
-    initMongoEngine(name, password)
+    initMongoEngine(db_name, db_password)
 
 
 # TODO check if not config

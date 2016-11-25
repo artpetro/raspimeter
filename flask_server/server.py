@@ -16,12 +16,14 @@ from db.mongo_models import CameraInput, MeterSettings, MeterImageSettings, KNNS
 from db.mongo_db_manager import MongoDataBaseManager as db
 from run.raspimeter import Raspimeter
 import assets
+from basic_auth import *
 
 if __name__ == '__main__':
     app.run()
     
     
 @app.route("/")
+@requires_auth
 def index():
     '''
     '''
@@ -37,6 +39,7 @@ def index():
 
 
 @app.route("/images", methods=['GET'])
+@requires_auth
 def renderImagesWithPagination():
     '''
     '''
@@ -72,6 +75,7 @@ def renderImagesWithPagination():
 
 
 @app.route("/values", methods=['GET'])
+@requires_auth
 def renderValuesWithPagination():
     '''
     '''
@@ -97,6 +101,7 @@ def renderValuesWithPagination():
 
 
 @app.route("/knn_data", methods=['GET'])
+@requires_auth
 def renderKNNData():
     '''
     '''
@@ -119,6 +124,7 @@ def renderKNNData():
 
 
 @app.route("/meters", methods=('GET', 'POST'))
+@requires_auth
 def renderMeters():
     '''
     '''
@@ -129,6 +135,7 @@ def renderMeters():
 
 
 @app.route("/meter_settings", methods=('GET', 'POST'))
+@requires_auth
 def renderMeterSettings():
     '''
     '''
@@ -146,6 +153,7 @@ def renderMeterSettings():
 
 
 @app.route("/meter_image_settings", methods=('GET', 'POST'))
+@requires_auth
 def renderMeterImageSettings():
     '''
     '''
@@ -164,6 +172,7 @@ def renderMeterImageSettings():
 
 
 @app.route("/knn_settings", methods=('GET', 'POST'))
+@requires_auth
 def renderKNNSettings():
     '''
     '''
@@ -182,6 +191,7 @@ def renderKNNSettings():
 
 
 @app.route("/settings", methods=('GET', 'POST'))
+@requires_auth
 def renderSettings():
     '''
     '''
@@ -193,6 +203,7 @@ def renderSettings():
 
 
 @app.route("/ci_settings", methods=('GET', 'POST'))
+@requires_auth
 def renderCiSettings():
     '''
     '''
@@ -211,25 +222,29 @@ def renderCiSettings():
 
 
 @app.route("/db_settings", methods=('GET', 'POST'))
+@requires_auth
 def renderatDatabaseSettings():
     '''
     '''
-    name = request.form.get('name')
-    password = request.form.get('password') 
+    db_name = request.form.get('db_name')
+    db_password = request.form.get('db_password') 
+    user_password = request.form.get('user_password') 
     
-    if name is None:
-        name = app.config["MONGODB_SETTINGS"]['DB']
-        password = app.config["SECRET_KEY"]
+    if db_name is None:
+        db_name = app.config["MONGODB_SETTINGS"]['DB']
+        db_password = app.config["SECRET_KEY"]
+        user_password = get_password()
     
-    if name != '':
+    if db_name != '':
         import flask_server
-        flask_server.updateDBConfig(name, password)
+        flask_server.updateDBConfig(db_name, db_password, user_password)
         #TODO restart server app here
         
-    return render_template('db_settings.html', name=name, password=password)
+    return render_template('db_settings.html', db_name=db_name, db_password=db_password, user_password=user_password)
 
 
 @app.route("/get_meter", methods=['GET'])
+@requires_auth
 def getMeter():
     '''
     '''
@@ -240,6 +255,7 @@ def getMeter():
      
 
 @app.route("/get_meters", methods=['GET'])
+@requires_auth
 def getMeters():
     '''
     '''
@@ -252,6 +268,7 @@ def getMeters():
 
 
 @app.route("/get_consumption", methods=['GET'])
+@requires_auth
 def getConsumption():
     '''
     '''
@@ -275,6 +292,7 @@ def getConsumption():
 
 
 @app.route("/get_weather", methods=['GET'])
+@requires_auth
 def getWeather():
     '''
     '''
@@ -300,6 +318,7 @@ def getWeather():
 
 
 @app.route("/get_image", methods=['GET'])
+@requires_auth
 def getImage():
     '''
     '''
@@ -307,6 +326,7 @@ def getImage():
 
 
 @app.route("/get_images", methods=['GET'])
+@requires_auth
 def getImages():
     '''
     '''
@@ -318,6 +338,7 @@ def getImages():
 
 
 @app.route("/delete_meter_value", methods=['GET'])
+@requires_auth
 def deleteMeterValue():
     '''
     '''
@@ -335,6 +356,7 @@ def deleteMeterValue():
 
 
 @app.route("/delete_knn_data", methods=['GET'])
+@requires_auth
 def deleteKNNData():
     '''
     '''
@@ -350,6 +372,7 @@ def deleteKNNData():
 
 
 @app.route("/delete_image", methods=['GET'])
+@requires_auth
 def deleteImage():
     '''
     '''
@@ -363,6 +386,7 @@ def deleteImage():
 
 
 @app.route("/save_digits", methods=['GET'])
+@requires_auth
 def saveDigits():
     '''
     get_digits?image_name=2016-06-05_21-34-30_5753bea9ca18a204c435d117_57549ae6108d4caa345b1fdb.png
@@ -387,6 +411,7 @@ def saveDigits():
 
 
 @app.route("/get_digits", methods=['GET'])
+@requires_auth
 def getDigits():
     '''
     '''
@@ -397,6 +422,7 @@ def getDigits():
 
 
 @app.route("/recognize_all", methods=['GET'])
+@requires_auth
 def recognizeAllOnPage():
     '''
     TODO long time request
@@ -410,6 +436,7 @@ def recognizeAllOnPage():
 
 
 @app.route("/recognize_bulk", methods=['GET'])
+@requires_auth
 def recognizeBulk():
     '''
     TODO long time request
@@ -420,6 +447,7 @@ def recognizeBulk():
 
 
 @app.route("/restart_server", methods=['GET'])
+@requires_auth
 def restartServer():
     '''
     '''
@@ -436,6 +464,7 @@ def restartServer():
 
 
 @app.route("/controls", methods=['GET'])
+@requires_auth
 def renderControls():
     '''
     '''
@@ -447,6 +476,7 @@ def renderControls():
 
 
 @app.route("/restart_runner", methods=['GET'])
+@requires_auth
 def restartRunner():
     '''
     '''
@@ -463,5 +493,6 @@ def restartRunner():
     
 
 @app.route('/js/<path:path>')
+@requires_auth
 def send_js(path):
     return send_from_directory(os.path.join('js', path).replace('\\','/'))
