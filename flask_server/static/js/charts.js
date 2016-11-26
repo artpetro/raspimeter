@@ -54,7 +54,7 @@ $(function () {
 	function renderChartContainer(meter) {
 		var meter_id = meter['_id']['$oid'];
 		var list = $('.charts-list');
-		$("#periodSelector_" + meter_id + " > #" + period).attr("class", 'ui-selected');
+		$("#periodSelector_" + meter_id + " > #" + period).attr("class", 'ui-widget-content ui-selected');
 		prepareChart(meter);
 		addPeriodSelecterHandler(meter);
 		renderDateRangePicker(meter);

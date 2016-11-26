@@ -18,8 +18,12 @@ $(function() {
 		var datePicker = tab.find("#date-range-picker");
 		var DATE_FORMAT = "YYYY-MM-DD HH:mm:ss";	
 		var range = datePicker.daterangepicker("getRange");
-		var startMoment = moment(range.start);
-		var endMoment = moment(range.end).add(1, 'days').subtract(1, 'seconds');
+		var startMoment = moment().subtract(1, 'months').startOf('day');
+		var endMoment = moment();
+		if (typeof range.start !== "undefined") {
+			startMoment = moment(range.start);
+			endMoment = moment(range.end).add(1, 'days').subtract(1, 'seconds');
+		}
 		var start = encodeURIComponent(moment(startMoment).format(DATE_FORMAT));
 		var end = encodeURIComponent(moment(endMoment).format(DATE_FORMAT));
 		
@@ -76,7 +80,7 @@ $(function() {
 		
 		datePicker.on('change', function(event) { 
 			
-			loadImagesTab(tab, url, meterId, 1, flag);//), startMoment, endMoment);
+			loadImagesTab(tab, url, meterId, 1, flag);
 				
 		});
 	}
