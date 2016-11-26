@@ -1,8 +1,43 @@
 $(function () {
+	
+	// TODO set cookie for each meter
+	// TODO set series number depends on chart type
+	var cookie = Cookies.get('raspimeter');
 	var period = 'd';
 	var startMoment = moment().subtract(1, 'months').startOf('day');
 	var endMoment = moment();
 	var DATE_FORMAT = "YYYY-MM-DD HH:mm:ss";
+	
+	if (typeof cookie === "undefined") {
+		Cookies.set('raspimeter', { period: period, 
+									start: startMoment, 
+									end: endMoment, 
+									series_visible: [false, false, true, true] }, 
+									{ expires: 365 });
+	} else {
+		var jsonCookie = Cookies.getJSON('raspimeter');
+		period = jsonCookie['period'];
+		startMoment = moment(jsonCookie['start']);
+		endMoment = moment(jsonCookie['end']);
+	}
+	
+	function updateCookieSeriesVisibility(index, visible) {
+		var jsonCookie = Cookies.getJSON('raspimeter');
+		jsonCookie['series_visible'][index] = visible;
+		Cookies.set('raspimeter', { period: jsonCookie['period'], 
+									start: jsonCookie['start'], 
+									end: jsonCookie['end'], 
+									series_visible: jsonCookie['series_visible'] }, 
+									{ expires: 365 });
+	}
+	
+	function updateCookie(period, start, end) {
+		Cookies.set('raspimeter', { period: period, 
+									start: start, 
+									end: end,
+									series_visible: Cookies.getJSON('raspimeter')['series_visible'] },
+									{ expires: 365 });
+	}
 	
 	if ($('.charts-list').size() > 0) {
 		loadChartDataAndRenderAllCharts(period, startMoment, endMoment);
@@ -19,6 +54,7 @@ $(function () {
 	function renderChartContainer(meter) {
 		var meter_id = meter['_id']['$oid'];
 		var list = $('.charts-list');
+		$("#periodSelector_" + meter_id + " > #" + period).attr("class", 'ui-selected');
 		prepareChart(meter);
 		addPeriodSelecterHandler(meter);
 		renderDateRangePicker(meter);
@@ -28,6 +64,10 @@ $(function () {
 	
 	function prepareChart(meter) {
 		var id = meter['_id']['$oid'];
+		var visibleSeries = [true, true, true, true];
+		if (Cookies.get('raspimeter') != "undefined") {
+			visibleSeries = Cookies.getJSON('raspimeter')['series_visible'];
+		}
 		Highcharts.setOptions({
 	        global: {
 	            useUTC: false
@@ -97,31 +137,40 @@ $(function () {
 	                marker: {
 	                    enabled: true
 	                }
+	            },
+	            series: {
+	                events: {
+	                    hide: function () {
+	                    	updateCookieSeriesVisibility(this.index, false);
+	                    },
+	                    show: function () {
+	                    	updateCookieSeriesVisibility(this.index, true);
+	                    }
+	                }
 	            }
 	        },
 	        series: [{
 	            name: meter.meter_settings['value_units'],
-	            visible: false,
+	            visible: visibleSeries[0],
 	            //data: costsAndConsumption['units'],
 	            type: 'column',
 	        },
 	        {
 		        name: '€',
-		        visible: false,
+		        visible: visibleSeries[1],
 		        //data: costsAndConsumption['costs'],
 		        type: 'column',		      
 	        },
 		    {
-			        
+	        	name: meter.meter_settings['converted_value_units'],
+	        	visible: visibleSeries[2],    
 		        type: 'column',
-		        name: meter.meter_settings['converted_value_units'],
 		        //data: costsAndConsumption['convUnits'],
-			      
 		      },  
 	        {
-			            
+		    	name: '°C',
+		    	visible: visibleSeries[3],
 		        type: 'spline',
-		        name: '°C',
 		        //data: weather,
 		        yAxis: 1,
 			        
@@ -157,6 +206,8 @@ $(function () {
 		var ranges = getRangesAsMoments(meterId);
 		var period = getPeriod(meterId);
 		var chart = $('#chart_' + meterId).highcharts();
+		
+		updateCookie(period, moment(ranges[0]), moment(ranges[1]));
 			
 		$.getJSON( "get_consumption?" 
 				+ "meter_id=" + meterId

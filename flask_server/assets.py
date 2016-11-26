@@ -17,6 +17,7 @@ bundles = {
         'js/lib/highcharts.js',
         'js/lib/jquery.lazyload.min.js',
         'js/lib/pnglib.js',
+        'js/lib/cookie.js',
         'js/raspimeter.js',
         'js/charts.js',
         output='gen/home.js'),
