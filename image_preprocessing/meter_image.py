@@ -40,7 +40,12 @@ class MeterImage(object):
         self.__meter_image_settings = meter.meter_image_settings
         self.__image_width = meter.meter_image_settings.image_width
         self.__rgb_source_image = source_image
-        self.__grayscaled_source_image = self.__getPreparedImage(source_image.copy())
+        if len(source_image.shape) == 3: 
+            self.__grayscaled_source_image = cv2.cvtColor(source_image, cv2.COLOR_BGR2GRAY)
+        else:
+            self.__grayscaled_source_image = source_image
+         
+        self.__prepared_source_image = self.__getPreparedImage(self.__grayscaled_source_image.copy())
         self.__digits_number = meter.meter_settings.digits_number
     
     
@@ -66,7 +71,6 @@ class MeterImage(object):
         
         if store_preview:
             height, width = image.shape[:2]
-            #TODO resize correctly
             copy = image.copy()
             resized = cv2.resize(copy, (int(width / 4), int(height / 4)))
             cv2.imwrite(path.replace('.png', '_preview.png'), resized)
@@ -112,9 +116,6 @@ class MeterImage(object):
         '''
         '''
         prepared_image = image
-        if len(image.shape) == 3: 
-            prepared_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-        
         height, width = prepared_image.shape[:2]
         prepared_image = cv2.resize(prepared_image, (self.__image_width, int(self.__image_width * height / width)))
         prepared_image = cv2.GaussianBlur(prepared_image, (3, 3), 0)
@@ -192,7 +193,7 @@ class MeterImage(object):
 #         for box in alignedBoundingBoxes:
 #             print box
         if store_aligned_boxes:
-            copy = self.__grayscaled_source_image.copy()
+            copy = self.__prepared_source_image.copy()
             
             for br in alignedBoundingBoxes:
                 x,y,w,h = br
@@ -202,7 +203,7 @@ class MeterImage(object):
             cv2.imwrite(self.__root_dir + image_name, copy)
             
         if show_aligned_boxes:
-            copy = self.__grayscaled_source_image.copy()
+            copy = self.__prepared_source_image.copy()
             
             for br in alignedBoundingBoxes:
                 x,y,w,h = br
@@ -264,7 +265,7 @@ class MeterImage(object):
             return_list.append((position, value[0][0]))
             
         if show_aligned_bounding_rects:
-            copy = self.__grayscaled_source_image.copy()
+            copy = self.__prepared_source_image.copy()
             
             for br in return_list:
                 x,y,w,h = br[1]
@@ -286,7 +287,7 @@ class MeterImage(object):
         # cut and return rects with digits
         for roi_and_pos in digits_by_position:
             x,y,w,h = roi_and_pos[1]
-            roi = self.__grayscaled_source_image[y : y + h, x : x + w]
+            roi = self.__prepared_source_image[y : y + h, x : x + w]
             digits.append(Digit(roi))
             x_axis_gaps.append(x-tmp_gap)
             tmp_gap = x
@@ -329,7 +330,7 @@ class MeterImage(object):
         filtered_contours = list()
         bounding_rects = list()
         
-        copy = self.__grayscaled_source_image.copy()
+        copy = self.__prepared_source_image.copy()
         
         for contour in contours:
             bounding_rect = cv2.boundingRect(contour)
@@ -351,7 +352,7 @@ class MeterImage(object):
             cv2.waitKey(0)
         
         if show_digits_candidates:
-            copy = self.__grayscaled_source_image.copy()
+            copy = self.__prepared_source_image.copy()
             
             for br in bounding_rects:
                 x,y,w,h = br
@@ -369,32 +370,32 @@ class MeterImage(object):
     def __getCannyEdges(self):
         '''
         '''
-        ret, _ = cv2.threshold(self.__grayscaled_source_image.copy(), 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
+        ret, _ = cv2.threshold(self.__prepared_source_image.copy(), 0, 255, cv2.THRESH_BINARY | cv2.THRESH_OTSU)
         canny_1 = ret * 0.5
         canny_2 = ret
             #print canny_1
             #print canny_2
     #         canny_1 = self.__meter_image_settings.canny_1
     #         canny_2 = self.__meter_image_settings.canny_2
-        return cv2.Canny(self.__grayscaled_source_image, canny_1, canny_2)
+        return cv2.Canny(self.__prepared_source_image, canny_1, canny_2)
     
     
     def __rotate(self, angle):
         '''
         '''
-        rows, cols = self.__grayscaled_source_image.shape 
+        rows, cols = self.__prepared_source_image.shape 
         M = cv2.getRotationMatrix2D((cols/2, rows/2), angle, 1)
-        self.__grayscaled_source_image = cv2.warpAffine(self.__grayscaled_source_image, M, (cols, rows))
+        self.__prepared_source_image = cv2.warpAffine(self.__prepared_source_image, M, (cols, rows))
         
         if show_rotated_image:
-            cv2.imshow('RotatedImage', self.__grayscaled_source_image)
+            cv2.imshow('RotatedImage', self.__prepared_source_image)
             cv2.waitKey(0)
         
     
     def __drawHoughLines(self, lines):
         '''
         '''
-        copy = self.__grayscaled_source_image.copy()
+        copy = self.__prepared_source_image.copy()
             
         for rho,theta in lines[0]:
             a = np.cos(theta)
@@ -412,7 +413,7 @@ class MeterImage(object):
     def __drawLines(self, lines):
         '''
         '''
-        copy = self.__grayscaled_source_image.copy()
+        copy = self.__prepared_source_image.copy()
             
         for rho,theta in lines:
             a = np.cos(theta)
