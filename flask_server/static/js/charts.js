@@ -208,6 +208,8 @@ $(function () {
 		var chart = $('#chart_' + meterId).highcharts();
 		
 		updateCookie(period, moment(ranges[0]), moment(ranges[1]));
+		
+		updateHeaderFormat(chart, period);
 			
 		$.getJSON( "get_consumption?" 
 				+ "meter_id=" + meterId
@@ -236,6 +238,35 @@ $(function () {
 					
 					chart.series[3].setData(weather, true);
 
+		});
+	}
+	
+	function updateHeaderFormat(chart, period) {
+		
+		switch (period) {
+		case 'h':
+			headerFormat = '<b>{point.x:%e.%m.%Y, %H:%M}</b><br>';
+			break;
+		case 'd':
+			headerFormat = '<b>{point.x:%e.%m.%Y}</b><br>';
+			break;
+		case 'w':
+			headerFormat = '<b>{point.x:From %e.%m.%Y}</b><br>';
+			break;
+		case 'm':
+			headerFormat = '<b>{point.x:%m.%Y}</b><br>';
+			break;
+		case 'y':
+		default:
+			headerFormat = '<b>{point.x:%Y}</b><br>';
+		}
+		
+		chart.series.forEach(function (serie) {
+			serie.update({
+				tooltip : {
+					headerFormat : headerFormat,
+				}
+			});
 		});
 	}
 		
