@@ -13,7 +13,7 @@ def create_backup():
     archive_path = os.path.abspath(os.path.join(backup_dir, '%s.tar.gz' % tmp_dir))
     try:
         call(['mongodump', '--out', tmp_path])
-        call(['tar', '-zcvf', '-C', archive_path, tmp_path, '.'])
+        call(['tar', '-zcvf', archive_path, '-C', tmp_path, '.'])
         call(['rm', '-rf', tmp_path])
         return True
      
