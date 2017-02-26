@@ -10,13 +10,22 @@
     <tbody>
     {% for backup in backups %}
       <tr>
-        <td class="lalign"><a href="/static/db_backups/{{ backup }}">{{ backup }}</td>
-        <td>{{ backup }}</td>
+        <td class="lalign"><a href="/static/db_backups/{{ backup[2] }}">{{ backup[0] }}</td>
+        <td>{{ backup[1] }}</td>
         <td><input type="checkbox"></td>
       </tr>
     {% endfor %}
     </tbody>
   </table>
   
-<!-- todo create, delete and restore buttons -->
+  <div class="settings-controls-container">
+	<div class="settings-image-container"></div>
+	  <div class="settings-buttons-container">
+		<button id="create-backup-button" class="save-button">Create</button>
+		<button id="restore-backup-button" class="test-button" >Restore selected</button>
+		<button id="delete-backup-button" class="delete-button" >Delete selected</button>
+		<button id="upload-backup-button" class="upload-button" >Upload</button>
+	  </div>
+	</div>
+	<!-- todo upload function with button -->
 </div>

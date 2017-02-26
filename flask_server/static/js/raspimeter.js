@@ -149,7 +149,7 @@ $(function() {
 	
 	function loadBackupTab(tab, url) {
 		tab.load(url, function() {
-			saveSettingsButtonHandler(tab);
+			backupButtonsHandler(tab, url);
 		});
 	}
 	
@@ -173,6 +173,42 @@ $(function() {
 				}
 			});
 		});
+	}
+	
+	function backupButtonsHandler(tab, url) {
+		
+		// create
+		var createBtn = tab.find("#create-backup-button");
+		createBtn.click(function(e) {
+			$.getJSON(
+				'/create_backup',
+				function(response) {
+					var result = response["result"];
+					if (result == "OK") {
+						loadBackupTab(tab, url);
+					} else {
+//						alert("ERROR");
+						renderErrorPage();
+					}
+			});
+		});	
+		
+		var deleteBtn = tab.find("#delete-backup-button");
+		deleteBtn.click(function(e) {
+			alert("NOT IMPLEMENTED!");
+		});	
+		
+		var uploadBtn = tab.find("#upload-backup-button");
+		uploadBtn.click(function(e) {
+			alert("NOT IMPLEMENTED!");
+		});
+		
+		var restoreBtn = tab.find("#restore-backup-button");
+		restoreBtn.click(function(e) {
+			alert("NOT IMPLEMENTED!");
+		});
+			
+		
 	}
 	
 	
@@ -458,6 +494,7 @@ $(function() {
 	function renderErrorPage() {
 		var page = $('.error');
 		page.addClass('visible');
+		page.show(0).delay(2500).hide(0);
 	}
 
 	// Get the filters object, turn it into a string and write it into the hash.
