@@ -2,13 +2,15 @@ import os, sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import time
+import datetime
 import traceback
 from subprocess import call
 
 backup_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'flask_server', 'static', 'db_backups'))
 
 def create_backup():
-    tmp_dir = 'raspimeter_db_%s' % int(round(time.time()))
+    date = datetime.datetime.now().strftime('%d-%m-%Y_%H:%M:%S')
+    tmp_dir = 'raspimeter_db_%s' % date
     tmp_path = os.path.abspath(os.path.join(backup_dir, tmp_dir))
     archive_path = os.path.abspath(os.path.join(backup_dir, '%s.tar.gz' % tmp_dir))
     try:
@@ -27,12 +29,10 @@ def restore_backup(name):
 
 
 def list_backups():
-    import datetime
     backups = []
     for file in os.listdir(backup_dir):
         if file.endswith(".tar.gz"):
-            timestamp = file.replace('raspimeter_db_', "").replace(".tar.gz", "")
-            date = datetime.datetime.fromtimestamp(int(timestamp)).strftime('%d-%m-%Y %H:%M:%S')
+            date = file.replace('raspimeter_db_', "").replace(".tar.gz", "")
             size = file_size(os.path.abspath(os.path.join(backup_dir, file)))
             backups.append((date, size, file))
         
