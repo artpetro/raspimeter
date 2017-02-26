@@ -135,6 +135,7 @@ $(function() {
 	$("#settings-tabs").tabs();
 	loadSettingsTab($("#settings-tabs-1"), "/db_settings");
 	loadSettingsTab($("#settings-tabs-2"), "/ci_settings");
+	loadBackupTab($("#settings-tabs-backup"), "/list_backups");
 	$("#settings-tabs-controls").load('/controls', function() {
 		addRestartButtonHandler($("#restart-server-button"), '/restart_server');
 		addRestartButtonHandler($("#restart-runner-button"), '/restart_runner');
@@ -145,7 +146,13 @@ $(function() {
 			saveSettingsButtonHandler(tab);
 		});
 	}
-
+	
+	function loadBackupTab(tab, url) {
+		tab.load(url, function() {
+			saveSettingsButtonHandler(tab);
+		});
+	}
+	
 	function saveSettingsButtonHandler(tab) {
 		var form = tab.find("form");
 		var url = form.attr("action");

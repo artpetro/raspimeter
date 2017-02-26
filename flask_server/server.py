@@ -10,12 +10,15 @@ from flask import request, send_from_directory, render_template, redirect
 from flask_mongoengine.wtf import model_form
 from flask.ext.wtf import Form
 
-from flask_server import app 
+from flask_server import app
+from db.db_backup import *
+
 from db.mongo_models import CameraInput, MeterSettings, MeterImageSettings, KNNSettings
 from db.mongo_db_manager import MongoDataBaseManager as db
 from run.raspimeter import Raspimeter
 import assets
 from basic_auth import *
+
 
 if __name__ == '__main__':
     app.run()
@@ -489,7 +492,29 @@ def restartRunner():
         traceback.print_exc()
     
     return json.dumps({'restart_runner': message})
+
+
+@app.route("/list_backups", methods=['GET'])
+@requires_auth
+def renderBackups():
+    '''
+    '''
+    backups = list_backups()
     
+    return render_template('backup.html', backups=backups)
+
+
+@app.route("/create_backup", methods=['GET'])
+@requires_auth
+def createBackup():
+    '''
+    '''
+    result = 'ERROR'
+    if create_backup(): 
+        result = 'OK' 
+    
+    return json.dumps({'result': result})
+
 
 @app.route('/js/<path:path>')
 @requires_auth

@@ -1,0 +1,22 @@
+<div class="backups page">
+	<table id="backups" cellspacing="0" cellpadding="0">
+    <thead>
+      <tr>
+        <th><span>Date</span></th>
+        <th><span>Size</span></th>
+        <th><span></span></th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for backup in backups %}
+      <tr>
+        <td class="lalign"><a href="/static/db_backups/{{ backup }}">{{ backup }}</td>
+        <td>{{ backup }}</td>
+        <td><input type="checkbox"></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  
+<!-- todo create, delete and restore buttons -->
+</div>
