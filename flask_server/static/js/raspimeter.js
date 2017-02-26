@@ -180,6 +180,8 @@ $(function() {
 		// create
 		var createBtn = tab.find("#create-backup-button");
 		createBtn.click(function(e) {
+			createBtn.prop('disabled', true);
+			showLoader();
 			$.getJSON(
 				'/create_backup',
 				function(response) {
@@ -187,9 +189,10 @@ $(function() {
 					if (result == "OK") {
 						loadBackupTab(tab, url);
 					} else {
-//						alert("ERROR");
 						renderErrorPage();
 					}
+					hideLoader();
+					createBtn.prop('disabled', false);
 			});
 		});	
 		
@@ -495,6 +498,18 @@ $(function() {
 		var page = $('.error');
 		page.addClass('visible');
 		page.show(0).delay(2500).hide(0);
+	}
+	
+	// Shows the loader.
+	function showLoader() {
+		var loader = $('.loader');
+		loader.addClass('visible');
+	}
+	
+	// Shows the loader.
+	function hideLoader() {
+		var loader = $('.loader');
+		loader.removeClass('visible');
 	}
 
 	// Get the filters object, turn it into a string and write it into the hash.
