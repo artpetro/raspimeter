@@ -366,12 +366,12 @@ class MongoDataBaseManager():
         '''
         meter = Meter.objects(id=meter_id).first()
         meter_values = MeterValue.objects(meter=meter, flag=VALIDE_VALUE)
-        
+        from run.raspimeter import Raspimeter
+            
         for meter_value in meter_values:
             meter_value.update(set__has_image=False)
             timestamp = meter_value.timestamp
             image_name = "%s_%s_%s.png" % (timestamp.strftime('%Y-%m-%d_%H-%M-%S'), meter_value.meter.id, meter_value.id)
-            from run.raspimeter import Raspimeter
             Raspimeter.deleteImage(image_name)
 
 
@@ -794,7 +794,9 @@ class MongoDataBaseManager():
 if __name__ == '__main__':
     pass
 
-    #MongoDataBaseManager.deleteAllSuccRecImages()
+    meters = MongoDataBaseManager.getMeters()
+    for meter in meters:
+        MongoDataBaseManager.deleteAllSuccRecImages(meter.id)
 
     #MongoDataBaseManager.createMeterType('Gas Meter Type')
     #MongoDataBaseManager.createMeter('Gas Meter Type', 'Gas Meter')
