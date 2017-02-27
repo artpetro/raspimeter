@@ -365,7 +365,7 @@ class MongoDataBaseManager():
         remove all success recognized images from file system 
         '''
         meter = Meter.objects(id=meter_id).first()
-        meter_values = MeterValue.objects(meter=meter, flag=VALIDE_VALUE)
+        meter_values = MeterValue.objects(meter=meter, flag=VALIDE_VALUE, has_image=True)
         from run.raspimeter import Raspimeter
             
         for meter_value in meter_values:
