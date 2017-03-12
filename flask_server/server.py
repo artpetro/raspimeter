@@ -520,3 +520,12 @@ def createBackup():
 @requires_auth
 def send_js(path):
     return send_from_directory(os.path.join('js', path).replace('\\','/'))
+
+
+@app.route('/static/<path:filename>')
+@requires_auth
+def protected(filename):
+    return send_from_directory(
+        os.path.join(app.instance_path, 'static'),
+        filename
+    )
