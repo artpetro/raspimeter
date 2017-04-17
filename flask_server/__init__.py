@@ -13,7 +13,7 @@ class SecuredStaticFlask(Flask):
         filename = os.normpath('/' + filename).lstrip('/')
         return super(SecuredStaticFlask, self).send_static_file(filename)
             
-app = SecuredStaticFlask(__name__)
+app = SecuredStaticFlask(__name__, static_url_path='/static')
 mongo_db_engine = None
 
 def initMongoEngine(name, password):
