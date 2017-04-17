@@ -23,7 +23,6 @@ from basic_auth import *
 if __name__ == '__main__':
     app.run()
     
-    
 @app.route("/")
 @requires_auth
 def index():
@@ -522,10 +521,12 @@ def send_js(path):
     return send_from_directory(os.path.join('js', path).replace('\\','/'))
 
 
-@app.route('/static/<path:filename>')
-@requires_auth
-def protected(filename):
-    return send_from_directory(
-        os.path.join(app.instance_path, 'static'),
-        filename
-    )
+# @app.route('/static/<path:filename>')
+# @requires_auth
+# def protected(filename):
+#     print filename
+#     print os.normpath('/' + filename).lstrip('/')
+#     return send_from_directory(
+#         os.path.join(app.instance_path, 'static'),
+#         filename#os.normpath('/' + filename).lstrip('/')
+#     )

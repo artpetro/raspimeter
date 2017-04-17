@@ -4,7 +4,16 @@ from flask.ext.mongoengine import MongoEngine
 import ConfigParser
 import os
 
-app = Flask(__name__)
+from basic_auth import *
+
+
+class SecuredStaticFlask(Flask):
+    @requires_auth
+    def send_static_file(self, filename):
+        filename = os.normpath('/' + filename).lstrip('/')
+        return super(SecuredStaticFlask, self).send_static_file(filename)
+            
+app = SecuredStaticFlask(__name__)
 mongo_db_engine = None
 
 def initMongoEngine(name, password):
